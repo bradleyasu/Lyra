@@ -13,7 +13,7 @@ public class Constants {
 	public static final int HEIGHT = 550;
 	
 	/* Sidebar attributes */
-	public static final int SIDEBAR_WIDTH = 250;
+	public static final int SIDEBAR_WIDTH = 200;
 	public static final int SIDEBAR_HEIGHT = HEIGHT;
 	
 	public static final int X_OFFSET = 16;

@@ -7,6 +7,6 @@ import com.hexotic.lyra.constants.Theme;
 public class LogPanel extends JPanel{
 
 	public LogPanel() {
-		this.setBackground(Theme.MAIN_BACKGROUND); 
+		this.setBackground(Theme.MAIN_BACKGROUND);
 	}
 }
