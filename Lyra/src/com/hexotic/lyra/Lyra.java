@@ -26,7 +26,7 @@ public class Lyra extends JFrame{
 		
 		/* Build main view */
 		mainFrame = new LyraFrame();
-		rootPane.add(mainFrame);
+		rootPane.add(mainFrame); 
 		mainFrame.setVisible(true);
 		
 		pack();
