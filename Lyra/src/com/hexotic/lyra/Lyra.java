@@ -1,6 +1,8 @@
 package com.hexotic.lyra;
 
 import java.awt.Dimension;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -28,6 +30,30 @@ public class Lyra extends JFrame{
 		mainFrame = new LyraFrame();
 		rootPane.add(mainFrame); 
 		mainFrame.setVisible(true);
+		
+		
+		this.addComponentListener(new ComponentListener() {
+			public void componentResized(ComponentEvent e) {
+				
+				int targetWidth = e.getComponent().getWidth() - Constants.X_OFFSET;
+				int targetHeight = e.getComponent().getHeight() - Constants.Y_OFFSET;
+				mainFrame.setSize(targetWidth, targetHeight);
+				mainFrame.setLocation(0,0);
+				
+			}
+
+			@Override
+			public void componentHidden(ComponentEvent e) {
+			}
+
+			@Override
+			public void componentMoved(ComponentEvent e) {
+			}
+
+			@Override
+			public void componentShown(ComponentEvent e) {
+			}
+		});
 		
 		pack();
 		this.setVisible(true);
