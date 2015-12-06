@@ -1,4 +1,4 @@
-package com.hexotic.lyra.components.controls;
+package com.hexotic.shadow.components.controls;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.text.Highlighter;
 
 import com.hexotic.lib.ui.input.textfield.ModernTextField;
-import com.hexotic.lyra.constants.Theme;
+import com.hexotic.shadow.constants.Theme;
 
 public class LogLine extends JPanel{
 

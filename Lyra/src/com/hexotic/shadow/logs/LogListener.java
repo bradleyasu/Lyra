@@ -1,4 +1,4 @@
-package com.hexotic.lyra.logs;
+package com.hexotic.shadow.logs;
 
 public interface LogListener {
 

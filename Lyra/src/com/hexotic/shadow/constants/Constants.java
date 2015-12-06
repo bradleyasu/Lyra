@@ -1,9 +1,9 @@
-package com.hexotic.lyra.constants;
+package com.hexotic.shadow.constants;
 
 public class Constants {
 
 	/* Software information */
-	public static final String APP_NAME = "Lyra";
+	public static final String APP_NAME = "Shadow";
 	public static final String APP_COMPANY = "Hexotic Software";
 	public static final String VERSION = "1.0.0";
 	

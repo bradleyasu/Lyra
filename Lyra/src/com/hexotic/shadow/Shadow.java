@@ -1,4 +1,4 @@
-package com.hexotic.lyra;
+package com.hexotic.shadow;
 
 import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
@@ -9,15 +9,15 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 
 import com.hexotic.lib.util.WinOps;
-import com.hexotic.lyra.components.frames.LyraFrame;
-import com.hexotic.lyra.constants.Constants;
+import com.hexotic.shadow.components.frames.ShadowFrame;
+import com.hexotic.shadow.constants.Constants;
 
-public class Lyra extends JFrame{
+public class Shadow extends JFrame{
 
 	private JDesktopPane rootPane;
 	private JInternalFrame mainFrame;
 	
-	public Lyra() {
+	public Shadow() {
 		this.setTitle(Constants.APP_NAME+" "+Constants.VERSION+" - "+Constants.APP_COMPANY);
 		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -27,7 +27,7 @@ public class Lyra extends JFrame{
 		this.setContentPane(rootPane);
 		
 		/* Build main view */
-		mainFrame = new LyraFrame();
+		mainFrame = new ShadowFrame();
 		rootPane.add(mainFrame); 
 		mainFrame.setVisible(true);
 		
@@ -65,7 +65,7 @@ public class Lyra extends JFrame{
 	public static void main(String[] args) {
 		 java.awt.EventQueue.invokeLater(new Runnable() {
 	          public void run() {
-	               new Lyra();
+	               new Shadow();
 	          }
 	    });
 	}

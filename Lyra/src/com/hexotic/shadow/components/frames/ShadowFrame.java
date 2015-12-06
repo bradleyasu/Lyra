@@ -1,4 +1,4 @@
-package com.hexotic.lyra.components.frames;
+package com.hexotic.shadow.components.frames;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -15,18 +15,18 @@ import javax.swing.JScrollPane;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import com.hexotic.lib.ui.panels.SimpleScroller;
-import com.hexotic.lyra.components.panels.LogPanel;
-import com.hexotic.lyra.components.panels.SidePanel;
-import com.hexotic.lyra.constants.Constants;
-import com.hexotic.lyra.constants.Theme;
-import com.hexotic.lyra.logs.Log;
+import com.hexotic.shadow.components.panels.LogPanel;
+import com.hexotic.shadow.components.panels.SidePanel;
+import com.hexotic.shadow.constants.Constants;
+import com.hexotic.shadow.constants.Theme;
+import com.hexotic.shadow.logs.Log;
 
-public class LyraFrame extends JInternalFrame{
+public class ShadowFrame extends JInternalFrame{
 
 	private LogPanel logPanel;
 	private SidePanel sidePanel;
 	
-	public LyraFrame() {
+	public ShadowFrame() {
 		this.setLayout(new BorderLayout());
 		buildFrame();
 		

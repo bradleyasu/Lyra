@@ -1,4 +1,4 @@
-package com.hexotic.lyra.logs;
+package com.hexotic.shadow.logs;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListener;
 
-import com.hexotic.lyra.constants.Constants;
+import com.hexotic.shadow.constants.Constants;
 
 public class Log {
 

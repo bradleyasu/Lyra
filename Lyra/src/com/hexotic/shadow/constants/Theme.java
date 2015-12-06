@@ -1,4 +1,4 @@
-package com.hexotic.lyra.constants;
+package com.hexotic.shadow.constants;
 
 import java.awt.Color;
 import java.awt.Font;

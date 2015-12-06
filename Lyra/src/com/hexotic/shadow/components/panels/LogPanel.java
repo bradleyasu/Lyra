@@ -1,4 +1,4 @@
-package com.hexotic.lyra.components.panels;
+package com.hexotic.shadow.components.panels;
 
 import java.awt.Color;
 import java.awt.GradientPaint;
@@ -13,11 +13,11 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import com.hexotic.lyra.components.controls.LogLine;
-import com.hexotic.lyra.constants.Constants;
-import com.hexotic.lyra.constants.Theme;
-import com.hexotic.lyra.logs.Log;
-import com.hexotic.lyra.logs.LogListener;
+import com.hexotic.shadow.components.controls.LogLine;
+import com.hexotic.shadow.constants.Constants;
+import com.hexotic.shadow.constants.Theme;
+import com.hexotic.shadow.logs.Log;
+import com.hexotic.shadow.logs.LogListener;
 
 public class LogPanel extends JPanel{
 

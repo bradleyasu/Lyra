@@ -1,11 +1,11 @@
-package com.hexotic.lyra.components.panels;
+package com.hexotic.shadow.components.panels;
 
 import java.awt.Dimension;
 
 import javax.swing.JPanel;
 
-import com.hexotic.lyra.constants.Constants;
-import com.hexotic.lyra.constants.Theme;
+import com.hexotic.shadow.constants.Constants;
+import com.hexotic.shadow.constants.Theme;
 
 public class SidePanel extends JPanel {
 
