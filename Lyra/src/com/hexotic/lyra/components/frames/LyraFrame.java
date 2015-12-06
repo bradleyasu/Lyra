@@ -1,12 +1,12 @@
 package com.hexotic.lyra.components.frames;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JInternalFrame;
@@ -19,6 +19,7 @@ import com.hexotic.lyra.components.panels.LogPanel;
 import com.hexotic.lyra.components.panels.SidePanel;
 import com.hexotic.lyra.constants.Constants;
 import com.hexotic.lyra.constants.Theme;
+import com.hexotic.lyra.logs.Log;
 
 public class LyraFrame extends JInternalFrame{
 
@@ -37,6 +38,7 @@ public class LyraFrame extends JInternalFrame{
 	private void buildFrame() {
 		JPanel panel = new JPanel(new BorderLayout());
 		logPanel = new LogPanel();
+		logPanel.setLog(new Log(new File("C:\\Users\\Bradley\\Desktop\\Log.log")));
 		final JScrollPane scroller = new JScrollPane(logPanel);
 		
 		scroller.getVerticalScrollBar().setUI(new SimpleScroller());
@@ -51,7 +53,6 @@ public class LyraFrame extends JInternalFrame{
 		
 		scroller.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {  
 			private boolean lock = false;
-			private int previousValue = 0;
 			private int previousMax = 0;
 			
 	        public void adjustmentValueChanged(AdjustmentEvent e) {
@@ -61,13 +62,10 @@ public class LyraFrame extends JInternalFrame{
 	        	} else {
 	        		lock = false;
 	        	}
-	        	System.out.println("Extent: "+extent+" Value: "+scroller.getVerticalScrollBar().getValue()+" Previous Value: "+previousValue +" Max: "+scroller.getVerticalScrollBar().getMaximum()+" Locked: "+lock);
 	        	if(lock){
 	        		e.getAdjustable().setValue(e.getAdjustable().getMaximum());  
 	        	}
-	        	
 	        	previousMax = e.getAdjustable().getMaximum();
-	        	previousValue = scroller.getVerticalScrollBar().getValue();
 	        }
 	    });
 		
@@ -78,28 +76,7 @@ public class LyraFrame extends JInternalFrame{
 		
 		
 		this.add(panel, BorderLayout.CENTER);
-		// test
-		logPanel.addKeyListener(new KeyListener(){
 
-			@Override
-			public void keyPressed(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-			}
-
-			@Override
-			public void keyReleased(KeyEvent arg0) {
-				logPanel.addLine("Key Pressed: "+arg0.getKeyChar());
-			}
-
-			@Override
-			public void keyTyped(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		});
-		logPanel.setFocusable(true);
-		logPanel.requestFocus();
 		
 	}
 }

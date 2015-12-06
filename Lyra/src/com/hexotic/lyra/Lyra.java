@@ -63,6 +63,10 @@ public class Lyra extends JFrame{
 	
 	
 	public static void main(String[] args) {
-		new Lyra();
+		 java.awt.EventQueue.invokeLater(new Runnable() {
+	          public void run() {
+	               new Lyra();
+	          }
+	    });
 	}
 }
