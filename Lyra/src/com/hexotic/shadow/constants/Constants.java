@@ -15,6 +15,10 @@ public class Constants {
 	public static final int SIDEBAR_WIDTH = 175;
 	public static final int SIDEBAR_HEIGHT = HEIGHT;
 	
+	/* Menubar attributes */
+	public static final int MENUBAR_WIDTH = WIDTH;
+	public static final int MENUBAR_HEIGHT = 35;
+	
 	public static final int X_OFFSET = 16;
 	public static final int Y_OFFSET = 39;
 

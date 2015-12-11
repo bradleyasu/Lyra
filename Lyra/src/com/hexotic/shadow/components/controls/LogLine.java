@@ -12,10 +12,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.text.Highlighter;
 
 import com.hexotic.lib.ui.input.textfield.ModernTextField;
 import com.hexotic.shadow.constants.Theme;
@@ -26,56 +27,82 @@ public class LogLine extends JPanel{
 	private String line;
 	private boolean isSelected = false;
 	private boolean isHovering = false;
-	private ModernTextField editField = null;
+	private boolean isEditing = false;
 	
-	public LogLine(int lineNumber, String line) {
-		this.lineNumber = lineNumber;
+	private ModernTextField editField = null;
+	private List<LineListener> listeners;
+	
+	public LogLine(int lneNumber, String line) {
+		this.lineNumber = lneNumber;
 		this.line = line;
+		listeners = new ArrayList<LineListener>();
 		
 		this.setLayout(new BorderLayout());
-		this.setPreferredSize(new Dimension(8000, 20));
+		this.setPreferredSize(new Dimension(80000, 20));
 		this.setMinimumSize(this.getPreferredSize());
 		this.setMaximumSize(this.getPreferredSize());
 		
 		this.addMouseListener(new MouseListener() {
+			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				isSelected = !isSelected;
-				if (e.getClickCount() == 2 && !e.isConsumed()) {
-				     e.consume();
-				     if(editField == null){
-				    	 makeEdit();
-				     }
-				}
-				refresh();
+
 			}
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				// If the user is holding ctrl and mouse key, auto select this line - they are probably trying to drag select
-				int buttonsDownMask = MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.BUTTON2_DOWN_MASK | MouseEvent.BUTTON3_DOWN_MASK; 
-				if ((e.getModifiersEx() & buttonsDownMask) != 0  && e.isControlDown()){
+				if (e.getModifiers() == MouseEvent.BUTTON1_MASK){
 					isSelected = !isSelected;
+					notifyListeners(new LineEvent(lineNumber, LineEvent.DRAGSELECTED));
 				} else {
 					isHovering = true;
 				}
 				refresh();
 			}
 			@Override
-			public void mouseExited(MouseEvent arg0) {
-				isHovering = false;
+			public void mouseExited(MouseEvent e) {
+				if (e.getModifiers() == MouseEvent.BUTTON1_MASK){
+					isSelected = true;
+					notifyListeners(new LineEvent(lineNumber, LineEvent.DRAGSELECTED));
+				} else {
+					isHovering = false;
+				}
 				refresh();
 			}
 			@Override
-			public void mousePressed(MouseEvent arg0) {
+			public void mousePressed(MouseEvent e) {
 			}
 			@Override
-			public void mouseReleased(MouseEvent arg0) {
+			public void mouseReleased(MouseEvent e) {
+				isSelected = true;
+				if (e.getClickCount() == 2 && !e.isConsumed()) {
+					e.consume();
+					if(editField == null){
+						makeEdit();
+					}
+				}
+				notifyListeners(new LineEvent(lineNumber, LineEvent.RELEASE));
+				refresh();
 			}
 		});
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		
 
+	}
+	
+	public int getLineNumber() {
+		return lineNumber;
+	}
+	
+	public void addLineListener(LineListener listener) {
+		listeners.add(listener);
+	}
+	
+	private void notifyListeners(LineEvent event){
+		for(LineListener listener: listeners){
+			listener.lineAction(event);
+		}
 	}
 	
 	public void setSelected(boolean selected) {
@@ -86,7 +113,11 @@ public class LogLine extends JPanel{
 		return isSelected;
 	}
 	
-	private void makeEdit() {
+	public boolean isEditable() {
+		return isEditing;
+	}
+	
+	public void makeEdit() {
 		JLabel space = new JLabel();
 		space.setPreferredSize(new Dimension(Theme.LINE_NUMBER_WIDTH+1, 20));
 		this.add(space, BorderLayout.WEST);
@@ -112,10 +143,11 @@ public class LogLine extends JPanel{
 			
 		});
 		this.add(editField, BorderLayout.CENTER);
+		isEditing = true;
 		refresh();
 	}
 	
-	private void removeEdit() {
+	public void removeEdit() {
 		if(editField != null){
 			this.remove(editField);
 			editField = null;

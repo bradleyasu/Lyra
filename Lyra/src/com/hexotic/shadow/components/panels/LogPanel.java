@@ -1,18 +1,20 @@
 package com.hexotic.shadow.components.panels;
 
-import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import com.hexotic.shadow.components.controls.LineEvent;
+import com.hexotic.shadow.components.controls.LineListener;
 import com.hexotic.shadow.components.controls.LogLine;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
@@ -22,6 +24,9 @@ import com.hexotic.shadow.logs.LogListener;
 public class LogPanel extends JPanel{
 
 	private TreeMap<Integer, LogLine> lines;
+	
+	private List<Integer> dragSelected;
+	
 	private int removeNext = 0;
 	private int lineCount = 0;
 	private Log log;
@@ -32,6 +37,7 @@ public class LogPanel extends JPanel{
 		this.setBackground(Theme.MAIN_BACKGROUND);
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		lines = new TreeMap<Integer, LogLine>();
+		dragSelected = new ArrayList<Integer>();
 		
 		bindHotkeys();
 		this.setFocusable(true);
@@ -41,7 +47,6 @@ public class LogPanel extends JPanel{
 	public void setLog(Log log) {
 		this.log = log;
 		log.addLogListener(new LogListener() {
-
 			@Override
 			public void lineAppeneded(String line) {
 				addLine(line);
@@ -93,8 +98,35 @@ public class LogPanel extends JPanel{
 			removeNext++;
 		}
 		
+		logLine.addLineListener(new LineListener() {
+			@Override
+			public void lineAction(LineEvent event) {
+				switch(event.getEvent()){
+					case  LineEvent.RELEASE:
+						for(LogLine line : lines.values()){
+							if(line.getLineNumber() != event.getLineNumber() && !dragSelected.contains(line.getLineNumber())){
+								line.setSelected(false);
+								line.removeEdit();
+							}
+						}
+						dragSelected.clear();
+						break;
+					case LineEvent.DRAGSELECTED:
+						dragSelected.add(event.getLineNumber());
+						break;
+						
+				}
+				
+				refresh();
+			}
+		});
+		
 		lineCount++;
 		
+		refresh();
+	}
+	
+	private void refresh() {
 		revalidate();
 		repaint();
 	}

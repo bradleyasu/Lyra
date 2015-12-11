@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.File;
 
 import javax.swing.BorderFactory;
@@ -15,7 +13,9 @@ import javax.swing.JScrollPane;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import com.hexotic.lib.ui.panels.SimpleScroller;
+import com.hexotic.shadow.components.panels.FooterBar;
 import com.hexotic.shadow.components.panels.LogPanel;
+import com.hexotic.shadow.components.panels.MenuBar;
 import com.hexotic.shadow.components.panels.SidePanel;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
@@ -50,6 +50,7 @@ public class ShadowFrame extends JInternalFrame{
 		scroller.getHorizontalScrollBar().setPreferredSize(scrollSize);
 		scroller.setBackground(Theme.MAIN_BACKGROUND);
 		scroller.setMinimumSize(logPanel.getPreferredSize());
+		scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		scroller.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {  
 			private boolean lock = false;
@@ -71,8 +72,13 @@ public class ShadowFrame extends JInternalFrame{
 		
 		sidePanel = new SidePanel();
 		
+		MenuBar menu = new MenuBar();
+		FooterBar footer = new FooterBar();
+		
+		panel.add(menu, BorderLayout.NORTH);
 		panel.add(scroller, BorderLayout.CENTER);
-		panel.add(sidePanel, BorderLayout.WEST);
+		panel.add(footer, BorderLayout.SOUTH);
+	//	panel.add(sidePanel, BorderLayout.WEST);
 		
 		
 		this.add(panel, BorderLayout.CENTER);
