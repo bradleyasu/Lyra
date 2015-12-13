@@ -23,9 +23,11 @@ import com.hexotic.shadow.logs.LogListener;
 
 public class LogPanel extends JPanel{
 
+	public static final int NO_PAUSE = 0;
+	public static final int GROW_BUT_DONT_REMOVE =1;
+	
 	private TreeMap<Integer, LogLine> lines;
 	
-	private List<Integer> selectedLines;
 	
 	private int removeNext = 0;
 	private int lineCount = 0;
@@ -34,12 +36,13 @@ public class LogPanel extends JPanel{
 	private int mouseDownLine = -1;
 	private int mouseUpLine = -1;
 	
+	private int pauseState = NO_PAUSE;
+	
 	public LogPanel() {
 		panel = this;
 		this.setBackground(Theme.MAIN_BACKGROUND);
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		lines = new TreeMap<Integer, LogLine>();
-		selectedLines = new ArrayList<Integer>();
 		
 		bindHotkeys();
 		this.setFocusable(true);
@@ -55,6 +58,10 @@ public class LogPanel extends JPanel{
 			}
 			
 		});
+	}
+	
+	public Log getLog() {
+		return log;
 	}
 	
 	private void bindHotkeys() {
@@ -82,12 +89,32 @@ public class LogPanel extends JPanel{
 		repaint();
 	}
 	
+	public void setPauseState(int state){
+		if(state == NO_PAUSE && state != pauseState){
+			flushLog();
+		}
+		pauseState = state;
+	}
+	
+	public void flushLog() {
+		while(lines.size() > Constants.LOG_MAX){
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+			      panel.remove(0);
+				}
+			});
+			
+			lines.remove(removeNext);
+			removeNext++;
+		}
+	}
+	
 	public void addLine(String line) {
 		LogLine logLine = new LogLine(lineCount, line);
 		lines.put(lineCount, logLine);
 		this.add(logLine);
 		
-		if(lines.size() > Constants.LOG_MAX){
+		if(lines.size() > Constants.LOG_MAX && pauseState == NO_PAUSE){
 			
 			// Cleanup old lines when the JVM can handle it
 			SwingUtilities.invokeLater(new Runnable() {

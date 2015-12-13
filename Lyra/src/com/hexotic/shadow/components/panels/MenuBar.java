@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 
 import javax.swing.JPanel;
 
+import com.hexotic.lib.ui.input.textfield.ModernTextField;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
 
@@ -17,7 +18,6 @@ public class MenuBar extends JPanel{
 		this.setBackground(Theme.MAIN_BACKGROUND);
 		this.setPreferredSize(new Dimension(Constants.MENUBAR_WIDTH, Constants.MENUBAR_HEIGHT));
 		this.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		
 	}
 	
 	

@@ -38,7 +38,7 @@ public class ShadowFrame extends JInternalFrame{
 	private void buildFrame() {
 		JPanel panel = new JPanel(new BorderLayout());
 		logPanel = new LogPanel();
-		logPanel.setLog(new Log(new File("C:\\Users\\Bradley\\Desktop\\Log.log")));
+		logPanel.setLog(new Log(new File("C:\\Users\\Bradley\\Desktop\\out.txt")));
 		final JScrollPane scroller = new JScrollPane(logPanel);
 		
 		scroller.getVerticalScrollBar().setUI(new SimpleScroller());
@@ -56,7 +56,6 @@ public class ShadowFrame extends JInternalFrame{
 			private boolean lock = false;
 			private int previousMax = 0;
 			private int lastLineCount = 0;
-			private int previousValue = 0;
 			
 	        public void adjustmentValueChanged(AdjustmentEvent e) {
 	        	int extent = scroller.getVerticalScrollBar().getModel().getExtent();
@@ -66,16 +65,12 @@ public class ShadowFrame extends JInternalFrame{
 	        		lock = false;
 	        	}
 	        	int currentLineCount = logPanel.getLineCount();
-	        	int growth = 20*(currentLineCount - lastLineCount);
-	        	
+
 	        	if(lock){
 	        		e.getAdjustable().setValue(e.getAdjustable().getMaximum());
-	        	} else if(currentLineCount > lastLineCount && previousValue == e.getValue()){
-	        		int value = e.getValue() - growth;
-	        		e.getAdjustable().setValue(value);
-	        		previousValue = value;
-	        	} else {
-	        		previousValue = e.getValue();
+	        		logPanel.setPauseState(LogPanel.NO_PAUSE);
+	        	} else if(currentLineCount > lastLineCount){
+	        		logPanel.setPauseState(LogPanel.GROW_BUT_DONT_REMOVE);
 	        	}
 	        	lastLineCount = currentLineCount;
 	        	previousMax = e.getAdjustable().getMaximum();
