@@ -25,6 +25,7 @@ public class ShadowFrame extends JInternalFrame{
 
 	private LogPanel logPanel;
 	private SidePanel sidePanel;
+	private MenuBar menu;
 	
 	public ShadowFrame() {
 		this.setLayout(new BorderLayout());
@@ -38,7 +39,7 @@ public class ShadowFrame extends JInternalFrame{
 	private void buildFrame() {
 		JPanel panel = new JPanel(new BorderLayout());
 		logPanel = new LogPanel();
-		logPanel.setLog(new Log(new File("C:\\Users\\Bradley\\Desktop\\out.txt")));
+		logPanel.setLog(new Log(new File("C:\\Users\\Bradley\\Desktop\\Log.log")));
 		final JScrollPane scroller = new JScrollPane(logPanel);
 		
 		scroller.getVerticalScrollBar().setUI(new SimpleScroller());
@@ -72,15 +73,18 @@ public class ShadowFrame extends JInternalFrame{
 	        	} else if(currentLineCount > lastLineCount){
 	        		logPanel.setPauseState(LogPanel.GROW_BUT_DONT_REMOVE);
 	        	}
+	        	
 	        	lastLineCount = currentLineCount;
 	        	previousMax = e.getAdjustable().getMaximum();
 	        }
 	    });
 		
 		sidePanel = new SidePanel();
+		menu = new MenuBar();
+		menu.setShadow(true);
 		
-		MenuBar menu = new MenuBar();
 		FooterBar footer = new FooterBar();
+		
 		
 		panel.add(menu, BorderLayout.NORTH);
 		panel.add(scroller, BorderLayout.CENTER);

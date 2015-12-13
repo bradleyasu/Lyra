@@ -1,13 +1,18 @@
 package com.hexotic.shadow;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 
+import com.hexotic.lib.exceptions.ResourceException;
+import com.hexotic.lib.resource.Resources;
 import com.hexotic.lib.util.WinOps;
 import com.hexotic.shadow.components.frames.ShadowFrame;
 import com.hexotic.shadow.constants.Constants;
@@ -30,6 +35,12 @@ public class Shadow extends JFrame{
 		mainFrame = new ShadowFrame();
 		rootPane.add(mainFrame); 
 		mainFrame.setVisible(true);
+		
+		List<Image> icons;
+		try {
+			icons = getIcons();
+			this.setIconImages(icons);
+		} catch (ResourceException e1) { /* Do Nothing */}
 		
 		
 		this.addComponentListener(new ComponentListener() {
@@ -61,6 +72,12 @@ public class Shadow extends JFrame{
 	}
 	
 	
+	private List<Image> getIcons() throws ResourceException {
+		List<Image> list = new ArrayList<Image>();
+		list.add(Resources.getInstance().getImage("icon_sm.png"));
+		list.add(Resources.getInstance().getImage("icon_med.png"));
+		return list;
+	}
 	
 	public static void main(String[] args) {
 		 java.awt.EventQueue.invokeLater(new Runnable() {

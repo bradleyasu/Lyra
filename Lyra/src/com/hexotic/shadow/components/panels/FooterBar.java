@@ -9,7 +9,7 @@ public class FooterBar extends JPanel{
 
 	public FooterBar() {
 		this.setPreferredSize(new Dimension(20,20));
-		this.setBackground(new Color(0x1B5E20));
+		this.setBackground(new Color(0x424242));
 	}
 	
 }

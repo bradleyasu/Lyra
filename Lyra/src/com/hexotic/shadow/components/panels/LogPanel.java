@@ -2,17 +2,18 @@ package com.hexotic.shadow.components.panels;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.TreeMap;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import com.hexotic.lib.exceptions.ResourceException;
+import com.hexotic.lib.resource.Resources;
 import com.hexotic.shadow.components.controls.LineEvent;
 import com.hexotic.shadow.components.controls.LineListener;
 import com.hexotic.shadow.components.controls.LogLine;
@@ -53,7 +54,7 @@ public class LogPanel extends JPanel{
 		this.log = log;
 		log.addLogListener(new LogListener() {
 			@Override
-			public void lineAppeneded(String line) {
+			public void lineAppeneded(String line, int event) {
 				addLine(line);
 			}
 			
@@ -68,7 +69,7 @@ public class LogPanel extends JPanel{
 		this.addKeyListener(new KeyListener() {
 			@Override
 			public void keyPressed(KeyEvent key) {
-				if(key.isControlDown() && key.getKeyCode() == key.VK_A){
+				if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_A){
 					selectAll();
 				}
 			}
@@ -198,7 +199,12 @@ public class LogPanel extends JPanel{
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
 		if(lines.isEmpty()){
-			g2d.drawString("Nothing Here", 10, 10);
+			try {
+				Image img = Resources.getInstance().getImage("Default.png");
+				g2d.drawImage(img, getWidth()/2-img.getWidth(null)/2, getHeight()/2-img.getHeight(null)/2, null);
+			} catch (ResourceException e) {
+				e.printStackTrace();
+			}
 		}
 		
 	}

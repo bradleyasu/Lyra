@@ -29,9 +29,9 @@ public class Log {
 		listeners.add(listener);
 	}
 	
-	public void notifyListeners(String line) {
+	public void notifyListeners(String line, int event) {
 		for(LogListener listener : listeners) {
-			listener.lineAppeneded(line);
+			listener.lineAppeneded(line, event);
 		}
 	}
 	
@@ -45,13 +45,14 @@ public class Log {
 			}
 			@Override
 			public void handle(String line) {
-				notifyListeners(line);
+				notifyListeners(line, LogListener.APPEND);
 			}
 			@Override
 			public void handle(Exception arg0) {
 			}
 			@Override
 			public void init(Tailer arg0) {
+				notifyListeners("", LogListener.INIT);
 			}
 	    	
 	    }, Constants.REFRESH_RATE);
