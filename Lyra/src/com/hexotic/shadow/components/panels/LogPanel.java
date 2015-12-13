@@ -25,23 +25,25 @@ public class LogPanel extends JPanel{
 
 	private TreeMap<Integer, LogLine> lines;
 	
-	private List<Integer> dragSelected;
+	private List<Integer> selectedLines;
 	
 	private int removeNext = 0;
 	private int lineCount = 0;
 	private Log log;
 	private LogPanel panel;
+	private int mouseDownLine = -1;
+	private int mouseUpLine = -1;
 	
 	public LogPanel() {
 		panel = this;
 		this.setBackground(Theme.MAIN_BACKGROUND);
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		lines = new TreeMap<Integer, LogLine>();
-		dragSelected = new ArrayList<Integer>();
+		selectedLines = new ArrayList<Integer>();
 		
 		bindHotkeys();
 		this.setFocusable(true);
-		this.requestFocus();
+		obtainFocus();
 	}
 	
 	public void setLog(Log log) {
@@ -74,7 +76,7 @@ public class LogPanel extends JPanel{
 
 	public void selectAll() {
 		for(LogLine line : lines.values()){
-			line.setSelected(!line.isSelected());
+			line.setSelected(true);
 		}
 		revalidate();
 		repaint();
@@ -102,19 +104,31 @@ public class LogPanel extends JPanel{
 			@Override
 			public void lineAction(LineEvent event) {
 				switch(event.getEvent()){
+					case LineEvent.CLICKED:
+						mouseDownLine = event.getLineNumber();
+						mouseUpLine = mouseDownLine;
+						updateSelected();
+						mouseUpLine = -1;
+						mouseDownLine = mouseUpLine;
+						break;
+					case LineEvent.PRESSED:
+						mouseDownLine = event.getLineNumber();
+						mouseUpLine = mouseDownLine;
+						updateSelected();
+						break;
 					case  LineEvent.RELEASE:
-						for(LogLine line : lines.values()){
-							if(line.getLineNumber() != event.getLineNumber() && !dragSelected.contains(line.getLineNumber())){
-								line.setSelected(false);
-								line.removeEdit();
-							}
+						mouseUpLine = -1;
+						mouseDownLine = mouseUpLine;
+						obtainFocus();
+						break;
+					case LineEvent.ENTERED:
+						if(mouseDownLine >= 0){
+							mouseDownLine = event.getLineNumber();
+							updateSelected();
 						}
-						dragSelected.clear();
 						break;
-					case LineEvent.DRAGSELECTED:
-						dragSelected.add(event.getLineNumber());
+					case LineEvent.EXITED:
 						break;
-						
 				}
 				
 				refresh();
@@ -126,9 +140,28 @@ public class LogPanel extends JPanel{
 		refresh();
 	}
 	
+	public int getLineCount() {
+		return lineCount;
+	}
+	
+	private void obtainFocus() {
+		this.requestFocus();
+	}
+	
+	private void updateSelected() {
+		for(int lineNumber : lines.keySet()){
+			lines.get(lineNumber).setSelected(isBetween(mouseDownLine, mouseUpLine, lineNumber));
+		}
+		refresh();
+	}
+	
 	private void refresh() {
 		revalidate();
 		repaint();
+	}
+	
+	public boolean isBetween(int start, int end, int value) {
+	    return end > start ? value >= start && value <= end : value >= end && value <= start;
 	}
 	
 	@Override

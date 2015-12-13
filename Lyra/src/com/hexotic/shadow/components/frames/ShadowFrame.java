@@ -55,17 +55,29 @@ public class ShadowFrame extends JInternalFrame{
 		scroller.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {  
 			private boolean lock = false;
 			private int previousMax = 0;
+			private int lastLineCount = 0;
+			private int previousValue = 0;
 			
 	        public void adjustmentValueChanged(AdjustmentEvent e) {
 	        	int extent = scroller.getVerticalScrollBar().getModel().getExtent();
-	        	if(e.getAdjustable().getMaximum() != previousMax && e.getValue()+extent >= previousMax){
+	        	if( e.getValue()+extent >= previousMax){
 	        		lock = true;
 	        	} else {
 	        		lock = false;
 	        	}
+	        	int currentLineCount = logPanel.getLineCount();
+	        	int growth = 20*(currentLineCount - lastLineCount);
+	        	
 	        	if(lock){
-	        		e.getAdjustable().setValue(e.getAdjustable().getMaximum());  
+	        		e.getAdjustable().setValue(e.getAdjustable().getMaximum());
+	        	} else if(currentLineCount > lastLineCount && previousValue == e.getValue()){
+	        		int value = e.getValue() - growth;
+	        		e.getAdjustable().setValue(value);
+	        		previousValue = value;
+	        	} else {
+	        		previousValue = e.getValue();
 	        	}
+	        	lastLineCount = currentLineCount;
 	        	previousMax = e.getAdjustable().getMaximum();
 	        }
 	    });

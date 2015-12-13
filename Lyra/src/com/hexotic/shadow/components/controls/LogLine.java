@@ -46,41 +46,29 @@ public class LogLine extends JPanel{
 			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-
+				notifyListeners(new LineEvent(lineNumber, LineEvent.CLICKED));
+				refresh();
 			}
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				// If the user is holding ctrl and mouse key, auto select this line - they are probably trying to drag select
-				if (e.getModifiers() == MouseEvent.BUTTON1_MASK){
-					isSelected = !isSelected;
-					notifyListeners(new LineEvent(lineNumber, LineEvent.DRAGSELECTED));
-				} else {
-					isHovering = true;
-				}
+				notifyListeners(new LineEvent(lineNumber, LineEvent.ENTERED));
+				isHovering = true;
 				refresh();
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {
-				if (e.getModifiers() == MouseEvent.BUTTON1_MASK){
-					isSelected = true;
-					notifyListeners(new LineEvent(lineNumber, LineEvent.DRAGSELECTED));
-				} else {
-					isHovering = false;
-				}
+				notifyListeners(new LineEvent(lineNumber, LineEvent.EXITED));
+				isHovering = false;
 				refresh();
 			}
 			@Override
 			public void mousePressed(MouseEvent e) {
+				notifyListeners(new LineEvent(lineNumber, LineEvent.PRESSED));
+				refresh();
 			}
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				isSelected = true;
-				if (e.getClickCount() == 2 && !e.isConsumed()) {
-					e.consume();
-					if(editField == null){
-						makeEdit();
-					}
-				}
 				notifyListeners(new LineEvent(lineNumber, LineEvent.RELEASE));
 				refresh();
 			}
