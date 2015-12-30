@@ -26,6 +26,7 @@ public class LogPanel extends JPanel{
 
 	public static final int NO_PAUSE = 0;
 	public static final int GROW_BUT_DONT_REMOVE =1;
+	public String filter = "";
 	
 	private TreeMap<Integer, LogLine> lines;
 	
@@ -61,6 +62,17 @@ public class LogPanel extends JPanel{
 		});
 	}
 	
+	public void filter(String text) {
+		filter = text;
+		for(LogLine line : lines.values()){
+			if(line.getText().contains(text)){ 
+				line.setVisible(true);
+			} else {
+				line.setVisible(false);
+			}
+		}
+	}
+	
 	public Log getLog() {
 		return log;
 	}
@@ -69,9 +81,13 @@ public class LogPanel extends JPanel{
 		this.addKeyListener(new KeyListener() {
 			@Override
 			public void keyPressed(KeyEvent key) {
-				if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_A){
+				if(key.isControlDown() && !key.isShiftDown() && key.getKeyCode() == KeyEvent.VK_A){
 					selectAll();
-				}
+				} else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_B){
+					bookMarkSelected();
+				} else if(key.isControlDown() && key.isShiftDown() && key.getKeyCode() == KeyEvent.VK_A){
+					selectBookmarked();
+				} 
 			}
 			@Override
 			public void keyReleased(KeyEvent arg0) {
@@ -81,10 +97,33 @@ public class LogPanel extends JPanel{
 			}
 		});
 	}
+	
 
+	private void bookMarkSelected() {
+		for(LogLine line : lines.values()){
+			if(line.isSelected() && line.isVisible()){
+				line.setBookmarked(!line.isBookmarked());
+			}
+		}	
+		revalidate();
+		repaint();
+	}
+	
+	public void selectBookmarked() {
+		for(LogLine line : lines.values()){
+			if(line.isVisible()){
+				line.setSelected(line.isBookmarked());
+			}
+		}
+		revalidate();
+		repaint();
+	}
+	
 	public void selectAll() {
 		for(LogLine line : lines.values()){
-			line.setSelected(true);
+			if(line.isVisible()){
+				line.setSelected(true);
+			}
 		}
 		revalidate();
 		repaint();
@@ -113,6 +152,9 @@ public class LogPanel extends JPanel{
 	public void addLine(String line) {
 		LogLine logLine = new LogLine(lineCount, line);
 		lines.put(lineCount, logLine);
+		if(!filter.isEmpty() && !logLine.getText().contains(filter)){
+			logLine.setVisible(false);
+		}
 		this.add(logLine);
 		
 		if(lines.size() > Constants.LOG_MAX && pauseState == NO_PAUSE){

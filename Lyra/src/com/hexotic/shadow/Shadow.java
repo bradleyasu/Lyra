@@ -9,18 +9,20 @@ import java.util.List;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 
 import com.hexotic.lib.exceptions.ResourceException;
 import com.hexotic.lib.resource.Resources;
 import com.hexotic.lib.util.WinOps;
+import com.hexotic.shadow.components.frames.MenuFrame;
 import com.hexotic.shadow.components.frames.ShadowFrame;
 import com.hexotic.shadow.constants.Constants;
 
 public class Shadow extends JFrame{
 
 	private JDesktopPane rootPane;
-	private JInternalFrame mainFrame;
+	private ShadowFrame mainFrame;
+	
+	private MenuFrame menuFrame;
 	
 	public Shadow() {
 		this.setTitle(Constants.APP_NAME+" "+Constants.VERSION+" - "+Constants.APP_COMPANY);
@@ -33,8 +35,16 @@ public class Shadow extends JFrame{
 		
 		/* Build main view */
 		mainFrame = new ShadowFrame();
+		menuFrame = new MenuFrame();
 		rootPane.add(mainFrame); 
+		rootPane.add(menuFrame);
+		
+		
 		mainFrame.setVisible(true);
+		menuFrame.setVisible(false);
+		
+		// Register the menu with the main frame so that it will be visible 
+		mainFrame.setMenu(menuFrame);
 		
 		List<Image> icons;
 		try {
@@ -51,6 +61,8 @@ public class Shadow extends JFrame{
 				mainFrame.setSize(targetWidth, targetHeight);
 				mainFrame.setLocation(0,0);
 				
+				menuFrame.setSize(Constants.SIDEBAR_WIDTH, targetHeight-Constants.FOOTER_SIZE-(Constants.FOOTER_SIZE/2));
+				menuFrame.setLocation(0,Constants.FOOTER_SIZE/2);
 			}
 
 			@Override

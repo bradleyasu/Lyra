@@ -28,6 +28,7 @@ public class LogLine extends JPanel{
 	private boolean isSelected = false;
 	private boolean isHovering = false;
 	private boolean isEditing = false;
+	private boolean isBookmarked = false;
 	
 	private ModernTextField editField = null;
 	private List<LineListener> listeners;
@@ -96,9 +97,17 @@ public class LogLine extends JPanel{
 	public void setSelected(boolean selected) {
 		this.isSelected = selected;
 	}
+
+	public void setBookmarked(boolean bookmarked){
+		isBookmarked = bookmarked;
+	}
 	
 	public boolean isSelected() {
 		return isSelected;
+	}
+	
+	public boolean isBookmarked() {
+		return isBookmarked;
 	}
 	
 	public boolean isEditable() {
@@ -148,6 +157,10 @@ public class LogLine extends JPanel{
 		repaint();
 	}
 	
+	public String getText() {
+		return line;
+	}
+	
 	@Override
 	public void paintComponent(Graphics g){ 
 		super.paintComponent(g);
@@ -171,15 +184,27 @@ public class LogLine extends JPanel{
 		// Draw Background
 		if(isSelected){
 			g2d.setColor(Theme.LINE_SELECT_COLOR);
-		} else if(isHovering) {
-			g2d.setColor(Theme.LINE_HOVER_COLOR);
+		} else if(line.contains("help")){
+			g2d.setColor(Theme.ERROR_COLOR);
 		} else {
 			g2d.setColor(Theme.LINE_BACKGROUND);
 		}
+		
+		if(isHovering && isSelected){
+			g2d.setColor(g2d.getColor().darker());
+		} else if(isHovering){
+			g2d.setColor(Theme.LINE_HOVER_COLOR);
+		}
+		
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 		
-		g2d.setColor(Theme.LINE_NUMBER_BACKGROUND);
+		if(isBookmarked){
+			g2d.setColor(Theme.LINE_BOOKMARK_COLOR);
+		} else {
+			g2d.setColor(Theme.LINE_NUMBER_BACKGROUND);
+		}
 		g2d.fillRect(0, 0, Theme.LINE_NUMBER_WIDTH, getHeight());
+		
 		
 
 		// Draw Line
@@ -190,6 +215,7 @@ public class LogLine extends JPanel{
 		
 		// Draw log line
 		g2d.setColor(Theme.LINE_FOREGROUND);
+		
 		g2d.drawString(line, Theme.LINE_NUMBER_WIDTH + 4 ,fht);
 		
 	}

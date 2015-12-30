@@ -13,10 +13,10 @@ import javax.swing.JScrollPane;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import com.hexotic.lib.ui.panels.SimpleScroller;
+import com.hexotic.shadow.components.panels.FilterBoxListener;
 import com.hexotic.shadow.components.panels.FooterBar;
+import com.hexotic.shadow.components.panels.FooterMenuItemListener;
 import com.hexotic.shadow.components.panels.LogPanel;
-import com.hexotic.shadow.components.panels.MenuBar;
-import com.hexotic.shadow.components.panels.SidePanel;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
 import com.hexotic.shadow.logs.Log;
@@ -24,8 +24,8 @@ import com.hexotic.shadow.logs.Log;
 public class ShadowFrame extends JInternalFrame{
 
 	private LogPanel logPanel;
-	private SidePanel sidePanel;
-	private MenuBar menu;
+	private FooterBar footer;
+	private MenuFrame menu;
 	
 	public ShadowFrame() {
 		this.setLayout(new BorderLayout());
@@ -39,14 +39,14 @@ public class ShadowFrame extends JInternalFrame{
 	private void buildFrame() {
 		JPanel panel = new JPanel(new BorderLayout());
 		logPanel = new LogPanel();
-		logPanel.setLog(new Log(new File("C:\\Users\\Bradley\\Desktop\\Log.log")));
+		logPanel.setLog(new Log(new File("C:\\Users\\Bradley\\Desktop\\Archive\\Cobble Stuff\\Log.log")));
 		final JScrollPane scroller = new JScrollPane(logPanel);
 		
 		scroller.getVerticalScrollBar().setUI(new SimpleScroller());
 		scroller.getHorizontalScrollBar().setUI(new SimpleScroller());
 		scroller.setBorder(BorderFactory.createEmptyBorder());
 		scroller.getVerticalScrollBar().setUnitIncrement(25);
-		Dimension scrollSize = new Dimension(5, 5);
+		Dimension scrollSize = new Dimension(15,15);
 		scroller.getVerticalScrollBar().setPreferredSize(scrollSize);
 		scroller.getHorizontalScrollBar().setPreferredSize(scrollSize);
 		scroller.setBackground(Theme.MAIN_BACKGROUND);
@@ -79,21 +79,30 @@ public class ShadowFrame extends JInternalFrame{
 	        }
 	    });
 		
-		sidePanel = new SidePanel();
-		menu = new MenuBar();
-		menu.setShadow(true);
+		//menu.setShadow(true);
 		
-		FooterBar footer = new FooterBar();
+		footer = new FooterBar();
 		
+		footer.getFilterBox().addFilterBoxListener(new FilterBoxListener(){
+			@Override
+			public void filterChanged(String filter) {
+				logPanel.filter(filter);
+			}
+		});
 		
-		panel.add(menu, BorderLayout.NORTH);
 		panel.add(scroller, BorderLayout.CENTER);
 		panel.add(footer, BorderLayout.SOUTH);
-	//	panel.add(sidePanel, BorderLayout.WEST);
-		
-		
 		this.add(panel, BorderLayout.CENTER);
-
-		
 	}
+	
+	public void setMenu(MenuFrame menuFrame){
+		this.menu = menuFrame;
+		footer.getPrimaryMenuItem().addFooterMenuItemListener(new FooterMenuItemListener(){
+			@Override
+			public void itemActivated(boolean activated) {
+				menu.setVisible(activated);
+			}
+		});
+	}
+	
 }
