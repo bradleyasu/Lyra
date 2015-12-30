@@ -26,7 +26,7 @@ public class FooterMenuItem extends JPanel{
 		this.icon = icon;
 		listeners = new ArrayList<FooterMenuItemListener>();
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		this.setPreferredSize(new Dimension(Constants.FOOTER_SIZE, Constants.FOOTER_SIZE));
+		this.setPreferredSize(new Dimension(Constants.FOOTER_COUNTER_WIDTH*2, Constants.FOOTER_SIZE));
 		
 		this.addMouseListener(new MouseListener() {
 			@Override
@@ -75,6 +75,6 @@ public class FooterMenuItem extends JPanel{
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.drawImage(icon, getWidth()/2 - icon.getWidth(null)/2, getHeight()/2 - icon.getHeight(null)/2, null);
+		g2d.drawImage(icon, -5, getHeight()/2 - icon.getHeight(null)/2, null);
 	}
 }

@@ -4,8 +4,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 import javax.swing.BoxLayout;
@@ -40,8 +45,11 @@ public class LogPanel extends JPanel{
 	
 	private int pauseState = NO_PAUSE;
 	
+	private List<LogPanelListener> listeners;
+	
 	public LogPanel() {
 		panel = this;
+		listeners = new ArrayList<LogPanelListener>();
 		this.setBackground(Theme.MAIN_BACKGROUND);
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		lines = new TreeMap<Integer, LogLine>();
@@ -51,12 +59,22 @@ public class LogPanel extends JPanel{
 		obtainFocus();
 	}
 	
+	public void addLogPanelListener(LogPanelListener listener){
+		listeners.add(listener);
+	}
+	
+	public void notifyListeners(int event, LogLine line){
+		for(LogPanelListener listener : listeners){
+			listener.lineEvent(event, line);
+		}
+	}
+	
 	public void setLog(Log log) {
 		this.log = log;
 		log.addLogListener(new LogListener() {
 			@Override
-			public void lineAppeneded(String line, int event) {
-				addLine(line);
+			public void lineAppeneded(String line, int event, String flag) {
+				addLine(line, flag);
 			}
 			
 		});
@@ -87,6 +105,8 @@ public class LogPanel extends JPanel{
 					bookMarkSelected();
 				} else if(key.isControlDown() && key.isShiftDown() && key.getKeyCode() == KeyEvent.VK_A){
 					selectBookmarked();
+				}  else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_C){
+					copySelected();
 				} 
 			}
 			@Override
@@ -99,9 +119,26 @@ public class LogPanel extends JPanel{
 	}
 	
 
+	private void copySelected() {
+		StringBuilder builder = new StringBuilder();
+		for(LogLine line : lines.values()){
+			if(line.isSelected()){
+				builder.append(line.getText()+"\n");
+			}
+		}
+		
+		Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clpbrd.setContents(new StringSelection(builder.toString()), null);
+	}
+	
 	private void bookMarkSelected() {
 		for(LogLine line : lines.values()){
 			if(line.isSelected() && line.isVisible()){
+				if(line.isBookmarked()){
+					notifyListeners(LogPanelListener.LINE_UNBOOKMARKED, line);
+				} else {
+					notifyListeners(LogPanelListener.LINE_BOOKMARKED, line);
+				}
 				line.setBookmarked(!line.isBookmarked());
 			}
 		}	
@@ -143,15 +180,31 @@ public class LogPanel extends JPanel{
 			      panel.remove(0);
 				}
 			});
-			
+			notifyListeners(LogPanelListener.LINE_REMOVED, lines.get(removeNext));
 			lines.remove(removeNext);
 			removeNext++;
 		}
 	}
 	
-	public void addLine(String line) {
-		LogLine logLine = new LogLine(lineCount, line);
+	public void addLine(String line, String flag) {
+		LogLine logLine = new LogLine(lineCount+1, flag, line);
 		lines.put(lineCount, logLine);
+		
+		switch(flag){
+		case FooterBar.COUNTER_ERROR:
+			logLine.setLineColor(Theme.ERROR_COLOR);
+			break;
+		case FooterBar.COUNTER_WARNING:
+			logLine.setLineColor(Theme.WARNING_COLOR);
+			break;
+		case FooterBar.COUNTER_SUCCESS:
+			logLine.setLineColor(Theme.SUCCESS_COLOR);
+			break;
+		case FooterBar.COUNTER_INFO:
+			logLine.setLineColor(Theme.INFO_COLOR);
+			break;
+		}
+		
 		if(!filter.isEmpty() && !logLine.getText().contains(filter)){
 			logLine.setVisible(false);
 		}
@@ -166,6 +219,7 @@ public class LogPanel extends JPanel{
 				}
 			});
 			
+			notifyListeners(LogPanelListener.LINE_REMOVED, lines.get(removeNext));
 			lines.remove(removeNext);
 			removeNext++;
 		}
@@ -204,6 +258,9 @@ public class LogPanel extends JPanel{
 				refresh();
 			}
 		});
+		
+		// notify everyone else that the line was appended
+		notifyListeners(LogPanelListener.LINE_APPENDED, logLine);
 		
 		lineCount++;
 		

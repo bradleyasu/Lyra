@@ -62,6 +62,18 @@ public class FooterCounter extends JPanel{
 		revalidate();
 		repaint();
 	}
+
+	public void decrement() {
+		if(getCount() > 0){
+			setCount(getCount() - 1);
+		}
+		refresh();
+	}
+	
+	public void increment() {
+		setCount(getCount() + 1);
+		refresh();
+	}
 	
 	@Override
 	public void paintComponent(Graphics g) {

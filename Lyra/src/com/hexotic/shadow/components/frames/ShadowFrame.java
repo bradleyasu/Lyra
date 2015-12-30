@@ -13,13 +13,16 @@ import javax.swing.JScrollPane;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import com.hexotic.lib.ui.panels.SimpleScroller;
+import com.hexotic.shadow.components.controls.LogLine;
 import com.hexotic.shadow.components.panels.FilterBoxListener;
 import com.hexotic.shadow.components.panels.FooterBar;
 import com.hexotic.shadow.components.panels.FooterMenuItemListener;
 import com.hexotic.shadow.components.panels.LogPanel;
+import com.hexotic.shadow.components.panels.LogPanelListener;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
 import com.hexotic.shadow.logs.Log;
+import com.hexotic.shadow.logs.LogListener;
 
 public class ShadowFrame extends JInternalFrame{
 
@@ -85,14 +88,49 @@ public class ShadowFrame extends JInternalFrame{
 		
 		footer.getFilterBox().addFilterBoxListener(new FilterBoxListener(){
 			@Override
-			public void filterChanged(String filter) {
+			public void filterChanged(String filter, boolean hasFocus) {
 				logPanel.filter(filter);
+				
+				// If the component gives up focus, refocus the main panel
+				if(!hasFocus){
+					logPanel.requestFocus();
+				}
+			}
+		});
+		
+		
+		logPanel.addLogPanelListener(new LogPanelListener() {
+			@Override
+			public void lineEvent(int event, LogLine line) {
+				switch(event){
+				case LogPanelListener.LINE_APPENDED:
+					if(footer.getCounters().containsKey(line.getFlag())){
+						footer.getCounters().get(line.getFlag()).increment();
+					}
+					break;
+				case LogPanelListener.LINE_REMOVED:
+					if(footer.getCounters().containsKey(line.getFlag())){
+						footer.getCounters().get(line.getFlag()).decrement();
+					}
+					if(line.isBookmarked()){
+						footer.getCounters().get(FooterBar.COUNTER_BOOKMARK).decrement();
+					}
+					break;
+				case LogPanelListener.LINE_BOOKMARKED:
+					footer.getCounters().get(FooterBar.COUNTER_BOOKMARK).increment();
+					break;
+				case LogPanelListener.LINE_UNBOOKMARKED:
+					footer.getCounters().get(FooterBar.COUNTER_BOOKMARK).decrement();
+					break;
+				}
 			}
 		});
 		
 		panel.add(scroller, BorderLayout.CENTER);
 		panel.add(footer, BorderLayout.SOUTH);
 		this.add(panel, BorderLayout.CENTER);
+		
+		logPanel.getLog().startShadow();
 	}
 	
 	public void setMenu(MenuFrame menuFrame){

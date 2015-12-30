@@ -6,8 +6,8 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.JPanel;
 
@@ -18,17 +18,28 @@ import com.hexotic.shadow.constants.Theme;
 
 public class FooterBar extends JPanel{
 
-
+	// Static counter names
+	public static final String COUNTER_SUCCESS = "0_SUCCESS";
+	public static final String COUNTER_INFO = "1_INFO";
+	public static final String COUNTER_WARNING = "2_WARNING";
+	public static final String COUNTER_ERROR = "3_ERROR";
+	public static final String COUNTER_BOOKMARK = "4_BOOKMARK";
+	
+	
 	private FooterMenuItem primaryMenuItem;
 	private FilterBox filter;
+	
+	// Line counters - Key being the counter name and value being the counter control
+	private Map<String, FooterCounter> counters;
 	
 	public FooterBar() {
 		this.setPreferredSize(new Dimension(Constants.FOOTER_SIZE, Constants.FOOTER_SIZE));
 		this.setBackground(Theme.FOOTER_BACKGROUND);
-		//this.setLayout(new FlowLayout(FlowLayout.LEFT, 0,0));
+		counters = new TreeMap<String, FooterCounter>();
+		
 		this.setLayout(new BorderLayout());
 		try {
-			primaryMenuItem = new FooterMenuItem(Resources.getInstance().getImage("icon_sm.png"));
+			primaryMenuItem = new FooterMenuItem(Resources.getInstance().getImage("icon_med.png"));
 			this.add(primaryMenuItem, BorderLayout.WEST);
 		} catch (ResourceException e1) {
 			e1.printStackTrace();
@@ -49,12 +60,21 @@ public class FooterBar extends JPanel{
 	private void setupCounters() {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0,0));
 		panel.setBackground(Theme.FOOTER_BACKGROUND);
-		panel.add(new FooterCounter(Theme.SUCCESS_COLOR, 0));
-		panel.add(new FooterCounter(Theme.INFO_COLOR, 30));
-		panel.add(new FooterCounter(Theme.WARNING_COLOR, 3));
-		panel.add(new FooterCounter(Theme.ERROR_COLOR, 6));
-		panel.add(new FooterCounter(Theme.LINE_BOOKMARK_COLOR, 4));
+		counters.put(COUNTER_SUCCESS, new FooterCounter(Theme.SUCCESS_COLOR, 0));
+		counters.put(COUNTER_INFO, new FooterCounter(Theme.INFO_COLOR, 0));
+		counters.put(COUNTER_WARNING, new FooterCounter(Theme.WARNING_COLOR, 0));
+		counters.put(COUNTER_ERROR, new FooterCounter(Theme.ERROR_COLOR, 0));
+		counters.put(COUNTER_BOOKMARK, new FooterCounter(Theme.LINE_BOOKMARK_COLOR, 0));
+		
+		for(FooterCounter counter : counters.values()){
+			panel.add(counter);
+		}
+		
 		this.add(panel, BorderLayout.CENTER);
+	}
+	
+	public Map<String, FooterCounter> getCounters() {
+		return counters;
 	}
 	
 	public FooterMenuItem getPrimaryMenuItem() {

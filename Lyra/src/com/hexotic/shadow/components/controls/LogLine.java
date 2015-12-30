@@ -1,6 +1,7 @@
 package com.hexotic.shadow.components.controls;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -24,6 +25,7 @@ import com.hexotic.shadow.constants.Theme;
 public class LogLine extends JPanel{
 
 	private int lineNumber;
+	private Color lineColor = Theme.LINE_BACKGROUND;
 	private String line;
 	private boolean isSelected = false;
 	private boolean isHovering = false;
@@ -33,9 +35,12 @@ public class LogLine extends JPanel{
 	private ModernTextField editField = null;
 	private List<LineListener> listeners;
 	
-	public LogLine(int lneNumber, String line) {
+	private String flag = "";
+	
+	public LogLine(int lneNumber, String flag, String line) {
 		this.lineNumber = lneNumber;
 		this.line = line;
+		this.flag = flag;
 		listeners = new ArrayList<LineListener>();
 		
 		this.setLayout(new BorderLayout());
@@ -78,6 +83,10 @@ public class LogLine extends JPanel{
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		
 
+	}
+	
+	public String getFlag() {
+		return flag;
 	}
 	
 	public int getLineNumber() {
@@ -161,6 +170,10 @@ public class LogLine extends JPanel{
 		return line;
 	}
 	
+	public void setLineColor(Color color){
+		lineColor = color;
+	}
+	
 	@Override
 	public void paintComponent(Graphics g){ 
 		super.paintComponent(g);
@@ -184,10 +197,8 @@ public class LogLine extends JPanel{
 		// Draw Background
 		if(isSelected){
 			g2d.setColor(Theme.LINE_SELECT_COLOR);
-		} else if(line.contains("help")){
-			g2d.setColor(Theme.ERROR_COLOR);
 		} else {
-			g2d.setColor(Theme.LINE_BACKGROUND);
+			g2d.setColor(lineColor);
 		}
 		
 		if(isHovering && isSelected){

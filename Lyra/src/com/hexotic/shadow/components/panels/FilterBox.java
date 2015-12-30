@@ -45,9 +45,13 @@ public class FilterBox extends JPanel{
 			public void keyPressed(KeyEvent arg0) {
 			}
 			@Override
-			public void keyReleased(KeyEvent arg0) {
+			public void keyReleased(KeyEvent key) {
 				// whenever a key is pressed, notify listeners that the state has changed
-				notifyListeners();
+				if(key.getKeyChar() == KeyEvent.VK_ENTER){
+					notifyListeners(false);
+				} else {
+					notifyListeners(true);
+				}
 			}
 			@Override
 			public void keyTyped(KeyEvent arg0) {
@@ -66,9 +70,9 @@ public class FilterBox extends JPanel{
 		
 	}
 	
-	private void notifyListeners(){
+	private void notifyListeners(boolean keepFocus){
 		for(FilterBoxListener listener : listeners){
-			listener.filterChanged(field.getText());
+			listener.filterChanged(field.getText(), keepFocus);
 		}
 	}
 	
