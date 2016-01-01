@@ -23,7 +23,7 @@ public class Constants {
 	public static final int Y_OFFSET = 39;
 
 	/* Footer attributes */
-	public static final int FOOTER_SIZE = 25;
+	public static final int FOOTER_SIZE = 20;
 	public static final int FOOTER_COUNTER_WIDTH = 50;
 	/* Log settings */
 	public static final int LOG_MAX = 2000;

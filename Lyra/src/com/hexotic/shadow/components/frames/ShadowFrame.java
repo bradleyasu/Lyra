@@ -2,9 +2,17 @@ package com.hexotic.shadow.components.frames;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.io.File;
+import java.util.TooManyListenersException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JInternalFrame;
@@ -22,13 +30,13 @@ import com.hexotic.shadow.components.panels.LogPanelListener;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
 import com.hexotic.shadow.logs.Log;
-import com.hexotic.shadow.logs.LogListener;
 
 public class ShadowFrame extends JInternalFrame{
 
 	private LogPanel logPanel;
 	private FooterBar footer;
 	private MenuFrame menu;
+	
 	
 	public ShadowFrame() {
 		this.setLayout(new BorderLayout());
@@ -37,12 +45,12 @@ public class ShadowFrame extends JInternalFrame{
 		this.setSize(Constants.WIDTH-Constants.X_OFFSET, Constants.HEIGHT-Constants.Y_OFFSET);
 		this.setBorder(BorderFactory.createEmptyBorder());
 		((BasicInternalFrameUI) this.getUI()).setNorthPane(null);
+
 	}
 	
 	private void buildFrame() {
 		JPanel panel = new JPanel(new BorderLayout());
 		logPanel = new LogPanel();
-		logPanel.setLog(new Log(new File("C:\\Users\\Bradley\\Desktop\\Archive\\Cobble Stuff\\Log.log")));
 		final JScrollPane scroller = new JScrollPane(logPanel);
 		
 		scroller.getVerticalScrollBar().setUI(new SimpleScroller());
@@ -130,6 +138,11 @@ public class ShadowFrame extends JInternalFrame{
 		panel.add(footer, BorderLayout.SOUTH);
 		this.add(panel, BorderLayout.CENTER);
 		
+	}
+	
+	public void openLog(File logFile) {
+		footer.reset();
+		logPanel.setLog(new Log(logFile));
 		logPanel.getLog().startShadow();
 	}
 	

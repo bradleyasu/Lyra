@@ -69,7 +69,19 @@ public class LogPanel extends JPanel{
 		}
 	}
 	
+	private void reset() {
+		pauseState = NO_PAUSE;
+		mouseUpLine = -1;
+		mouseDownLine = -1;
+		removeNext = 0;
+		lineCount = 0;
+		panel.removeAll();
+		lines.clear();
+	}
+	
 	public void setLog(Log log) {
+		reset();
+		refresh();
 		this.log = log;
 		log.addLogListener(new LogListener() {
 			@Override
@@ -82,6 +94,11 @@ public class LogPanel extends JPanel{
 	
 	public void filter(String text) {
 		filter = text;
+		
+//		if(filter.startsWith("/")){
+//			text = text.substring(1,text.length());
+//			System.out.println(text);
+//		} else {
 		for(LogLine line : lines.values()){
 			if(line.getText().contains(text)){ 
 				line.setVisible(true);
@@ -89,6 +106,7 @@ public class LogPanel extends JPanel{
 				line.setVisible(false);
 			}
 		}
+//		}
 	}
 	
 	public Log getLog() {
@@ -174,7 +192,7 @@ public class LogPanel extends JPanel{
 	}
 	
 	public void flushLog() {
-		while(lines.size() > Constants.LOG_MAX){
+		while(lines.size() > Constants.LOG_MAX +1){
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 			      panel.remove(0);
@@ -187,7 +205,7 @@ public class LogPanel extends JPanel{
 	}
 	
 	public void addLine(String line, String flag) {
-		LogLine logLine = new LogLine(lineCount+1, flag, line);
+		LogLine logLine = new LogLine(lineCount, flag, line);
 		lines.put(lineCount, logLine);
 		
 		switch(flag){
@@ -210,7 +228,7 @@ public class LogPanel extends JPanel{
 		}
 		this.add(logLine);
 		
-		if(lines.size() > Constants.LOG_MAX && pauseState == NO_PAUSE){
+		if(lines.size() > Constants.LOG_MAX+1 && pauseState == NO_PAUSE){
 			
 			// Cleanup old lines when the JVM can handle it
 			SwingUtilities.invokeLater(new Runnable() {

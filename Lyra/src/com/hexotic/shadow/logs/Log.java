@@ -29,10 +29,10 @@ public class Log {
 		flags = new HashMap<String, String>();
 		
 		// Add test flags
-		addFlag(FooterBar.COUNTER_WARNING, "BaSingSe");
-		addFlag(FooterBar.COUNTER_ERROR, "something");
-		addFlag(FooterBar.COUNTER_INFO, "bradass");
-		addFlag(FooterBar.COUNTER_SUCCESS, "asdf");
+		addFlag(FooterBar.COUNTER_WARNING, "WARN");
+		addFlag(FooterBar.COUNTER_ERROR, "ERROR");
+		addFlag(FooterBar.COUNTER_INFO, "DEBUG");
+		addFlag(FooterBar.COUNTER_SUCCESS, "INFO");
 	}
 	
 	public void addFlag(String type, String query) {

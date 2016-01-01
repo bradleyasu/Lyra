@@ -100,7 +100,9 @@ public class FooterCounter extends JPanel{
 
 		g2d.setColor(Theme.FOOTER_BACKGROUND);
 		g2d.setFont(font);
-		g2d.drawString(String.valueOf(count), getWidth()/2-fwd/2, getHeight()/2+fht/3);
+		if(count > 0){
+			g2d.drawString(String.valueOf(count), getWidth()/2-fwd/2, getHeight()/2+fht/3);
+		}
 		
 //		g2d.setColor(Theme.FOOTER_BACKGROUND_DARKER);
 //		g2d.drawRect(0, 0, getWidth()-1, getHeight()-1);

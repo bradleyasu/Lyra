@@ -39,7 +39,7 @@ public class FooterBar extends JPanel{
 		
 		this.setLayout(new BorderLayout());
 		try {
-			primaryMenuItem = new FooterMenuItem(Resources.getInstance().getImage("icon_med.png"));
+			primaryMenuItem = new FooterMenuItem(Resources.getInstance().getImage("menu.png"));
 			this.add(primaryMenuItem, BorderLayout.WEST);
 		} catch (ResourceException e1) {
 			e1.printStackTrace();
@@ -71,6 +71,12 @@ public class FooterBar extends JPanel{
 		}
 		
 		this.add(panel, BorderLayout.CENTER);
+	}
+	
+	public void reset() {
+		for(FooterCounter counter : counters.values()){
+			counter.setCount(0);
+		}
 	}
 	
 	public Map<String, FooterCounter> getCounters() {

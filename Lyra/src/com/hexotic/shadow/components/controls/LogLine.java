@@ -186,7 +186,7 @@ public class LogLine extends JPanel{
 		
 		FontMetrics metrics = g2d.getFontMetrics(font);
 		int fht = metrics.getHeight();
-		int fwd = metrics.stringWidth(String.valueOf(lineNumber));
+		int fwd = metrics.stringWidth(String.valueOf(lineNumber+1));
 
 		// Resize number pane if needed
 		if(fwd+2 >= Theme.LINE_NUMBER_WIDTH) {
@@ -220,7 +220,7 @@ public class LogLine extends JPanel{
 
 		// Draw Line
 		g2d.setColor(Theme.LINE_NUMBER_COLOR);
-		g2d.drawString(String.valueOf(lineNumber), Theme.LINE_NUMBER_WIDTH-fwd-1, fht);
+		g2d.drawString(String.valueOf(lineNumber+1), Theme.LINE_NUMBER_WIDTH-fwd-1, fht);
 		
 		g2d.drawLine(Theme.LINE_NUMBER_WIDTH, 0, Theme.LINE_NUMBER_WIDTH, getHeight());
 		

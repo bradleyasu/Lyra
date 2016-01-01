@@ -13,7 +13,8 @@ public class Theme {
 
 	/* Primary Theme Colors */
 	public static Color MAIN_BACKGROUND = new Color(0xBDC3C7);
-	public static Color SIDEBAR_BACKGROUND = new Color(0xf4f4f4); 
+	public static Color SIDEBAR_BACKGROUND = new Color(0xf4f4f4);
+	public static Color SHADOW_COLOR = new Color(0x3b3b3b);
 	
 	public static Color LINE_NUMBER_COLOR = new Color(0x2C3E50);
 	public static Color LINE_NUMBER_BACKGROUND = new Color(0xBDC3C7);
@@ -30,7 +31,7 @@ public class Theme {
 	
 	/* Footer colors */
 	public static Color FOOTER_BACKGROUND = new Color(0x34495E);
-	public static Color FOOTER_BACKGROUND_DARKER = new Color(0x2C3E50);
+	public static Color FOOTER_BACKGROUND_DARKER = FOOTER_BACKGROUND.darker();
 	public static Font FOOTER_FONT;
 	public static float FOOTER_FONT_SIZE = (float) 12.0;
 	public static Color FOOTER_FONT_COLOR = new Color(0xECF0F1);

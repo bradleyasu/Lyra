@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 
 import com.hexotic.lib.exceptions.ResourceException;
 import com.hexotic.lib.resource.Resources;
+import com.hexotic.shadow.components.controls.BlockCaret;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
 
@@ -34,6 +35,7 @@ public class FilterBox extends JPanel{
 		field.setBackground(Theme.FOOTER_BACKGROUND_DARKER);
 		field.setForeground(Theme.FOOTER_FONT_COLOR);
 		field.setBorder(BorderFactory.createEmptyBorder());
+		field.setCaret(new BlockCaret());
 		field.setCaretColor(Theme.FOOTER_FONT_COLOR);
 		this.setBackground(Theme.FOOTER_BACKGROUND_DARKER);
 		this.setLayout(new BorderLayout(4,4));
