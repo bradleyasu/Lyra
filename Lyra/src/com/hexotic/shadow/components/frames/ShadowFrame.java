@@ -13,6 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import com.hexotic.lib.ui.panels.SimpleScroller;
+import com.hexotic.shadow.components.controls.LogLine;
 import com.hexotic.shadow.components.panels.LogPanel;
 import com.hexotic.shadow.components.panels.LogPanelEvent;
 import com.hexotic.shadow.components.panels.LogPanelListener;
@@ -92,7 +93,7 @@ public class ShadowFrame extends JInternalFrame{
 		
 		footer.getFilterBox().addFilterBoxListener(new FilterBoxListener(){
 			@Override
-			public void filterChanged(String filter, boolean hasFocus) {
+			public void filterChanged(String filter, boolean hasFocus, boolean canceled) {
 				logPanel.filter(filter);
 				
 				// If the component gives up focus, refocus the main panel
@@ -108,15 +109,15 @@ public class ShadowFrame extends JInternalFrame{
 			public void lineEvent(LogPanelEvent event) {
 				switch(event.getEvent()){
 				case LogPanelEvent.LINE_APPENDED:
-					if(footer.getCounters().containsKey(event.getLine().getFlag())){
-						footer.getCounters().get(event.getLine().getFlag()).increment();
+					if(footer.getCounters().containsKey(((LogLine)event.getEventObj()).getFlag())){
+						footer.getCounters().get(((LogLine)event.getEventObj()).getFlag()).increment();
 					}
 					break;
 				case LogPanelEvent.LINE_REMOVED:
-					if(footer.getCounters().containsKey(event.getLine().getFlag())){
-						footer.getCounters().get(event.getLine().getFlag()).decrement();
+					if(footer.getCounters().containsKey(((LogLine)event.getEventObj()).getFlag())){
+						footer.getCounters().get(((LogLine)event.getEventObj()).getFlag()).decrement();
 					}
-					if(event.getLine().isBookmarked()){
+					if(((LogLine)event.getEventObj()).isBookmarked()){
 						footer.getCounters().get(Flags.COUNTER_BOOKMARK).decrement();
 					}
 					break;
@@ -132,6 +133,12 @@ public class ShadowFrame extends JInternalFrame{
 				case LogPanelEvent.HOTKEY_CLOSE:
 					closeLog();
 					break;
+				case LogPanelEvent.HOTKEY_SHADOW_MENU:
+					footer.getPrimaryMenuItem().click();
+					break;
+				case LogPanelEvent.ACTIVATE_LOG:
+					openLog(LogFactory.getLog((String)event.getEventObj()));
+					break;
 				}
 			}
 		});
@@ -144,19 +151,24 @@ public class ShadowFrame extends JInternalFrame{
 	
 	public void closeLog()  {
 		footer.reset();
+		//logPanel.getLog().close();
 		logPanel.reset();
 		revalidate();
 		repaint();
 	}
 	
-	public void openLog(File logFile) {
+	public void openLog(Log log){
 		footer.reset();
-		Log log = LogFactory.getLog(logFile);
+		if(!log.isStarted()){
+			menu.addItem(log);
+		}
 		logPanel.setLog(log);
-		menu.addItem(log);
-		
 		// Start the shadow process
 		logPanel.getLog().startShadow();
+	}
+	
+	public void openLog(File logFile) {
+		openLog(LogFactory.getLog(logFile));
 	}
 	
 	public void setMenu(MenuFrame menuFrame){

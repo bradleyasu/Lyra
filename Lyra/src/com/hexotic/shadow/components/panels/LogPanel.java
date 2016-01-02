@@ -66,9 +66,9 @@ public class LogPanel extends JPanel{
 		listeners.add(listener);
 	}
 	
-	public void notifyListeners(int event, LogLine line){
+	public void notifyListeners(int event, Object obj){
 		for(LogPanelListener listener : listeners){
-			listener.lineEvent(new LogPanelEvent(event, line));
+			listener.lineEvent(new LogPanelEvent(event, obj));
 		}
 	}
 	
@@ -96,9 +96,13 @@ public class LogPanel extends JPanel{
 		if(!log.isStarted()){
 			log.addLogListener(new LogListener() {
 				@Override
-				public void lineAppeneded(String logId, String line, int event, String flag) {
-					if(activeLogId.equals(logId)){
-						addLine(line, flag);
+				public void logEvent(String logId, String line, int event, String flag) {
+					if(event == LogListener.APPEND || event == LogListener.INIT){
+						if(activeLogId.equals(logId)){
+							addLine(line, flag);
+						}
+					} else if(event == LogListener.MAKE_ACTIVE){
+						notifyListeners(LogPanelEvent.ACTIVATE_LOG, logId);
 					}
 				}
 			});
@@ -142,6 +146,8 @@ public class LogPanel extends JPanel{
 					notifyListeners(LogPanelEvent.HOTKEY_FIND, null);
 				} else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_W){
 					notifyListeners(LogPanelEvent.HOTKEY_CLOSE, null);
+				} else if(key.getKeyCode() == KeyEvent.VK_SPACE){
+					notifyListeners(LogPanelEvent.HOTKEY_SHADOW_MENU, null);
 				} 
 			}
 			@Override
@@ -274,7 +280,11 @@ public class LogPanel extends JPanel{
 			// Cleanup old lines when the JVM can handle it
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-			      panel.remove(0);
+					try{
+						panel.remove(0);
+					} catch (Exception e){
+						System.out.println("Failed to remove line");
+					}
 				}
 			});
 			

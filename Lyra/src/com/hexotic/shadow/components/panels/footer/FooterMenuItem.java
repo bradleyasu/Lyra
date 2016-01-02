@@ -40,15 +40,19 @@ public class FooterMenuItem extends JPanel{
 			}
 			@Override
 			public void mousePressed(MouseEvent arg0) {
-				selected = !selected;
-				notifyListeners();
-				updateBackground();
+				click();
 			}
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 			}
 		});
 		
+		updateBackground();
+	}
+	
+	public void click() {
+		selected = !selected;
+		notifyListeners();
 		updateBackground();
 	}
 	

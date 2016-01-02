@@ -33,6 +33,18 @@ public class LogFactory {
 		return log;
 	}
 	
+	public static Log getLog(String id){
+		Log log = null;
+		if(logs.containsKey(id)){
+			log = logs.get(id);
+		}
+		return log;
+	}
+	
+	public static void removeLog(String id){
+		logs.remove(id);
+	}
+	
 	private static String generateLogId(File log) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		String input = log.getAbsolutePath()+"--"+log.getName();
 		MessageDigest md = MessageDigest.getInstance("SHA1");

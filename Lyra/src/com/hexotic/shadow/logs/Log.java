@@ -50,11 +50,16 @@ public class Log {
 		return logId;
 	}
 	
+	public void activate() {
+		notifyListeners("", LogListener.MAKE_ACTIVE, "");
+	}
+	
 	public void close() {
 		if(tailer != null) {
 			tailer.stop();
 		}
 		started = false;
+		notifyListeners("", LogListener.LOG_CLOSED, "");
 	}
 	
 	public void addFlag(String type, String query) {
@@ -71,7 +76,7 @@ public class Log {
 	
 	public void notifyListeners(String line, int event, String flag) {
 		for(LogListener listener : listeners) {
-			listener.lineAppeneded(logId, line, event, flag);
+			listener.logEvent(logId, line, event, flag);
 		}
 	}
 	
@@ -96,6 +101,7 @@ public class Log {
 			tailer = Tailer.create(log, new TailerListener() {
 				@Override
 				public void fileNotFound() {
+					notifyListeners("", LogListener.NOT_FOUND, "");
 				}
 				@Override
 				public void fileRotated() {

@@ -14,6 +14,8 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 import com.hexotic.shadow.components.panels.menu.AboutMenu;
 import com.hexotic.shadow.components.panels.menu.MenuControlPanel;
 import com.hexotic.shadow.components.panels.menu.MenuControlPanelListener;
+import com.hexotic.shadow.components.panels.menu.MenuEvent;
+import com.hexotic.shadow.components.panels.menu.MenuListener;
 import com.hexotic.shadow.components.panels.menu.OptionsMenu;
 import com.hexotic.shadow.components.panels.menu.ShadowMenuItem;
 import com.hexotic.shadow.components.panels.menu.ShadowsMenu;
@@ -84,6 +86,16 @@ public class MenuFrame extends JInternalFrame{
 			cardLayout = new CardLayout();
 			menuCards = new JPanel(cardLayout);
 			shadowsMenu = new ShadowsMenu();
+			shadowsMenu.addMenuListener(new MenuListener(){
+				@Override
+				public void menuActionPerformed(MenuEvent event) {
+					if(event.getMenuEventType() == MenuEvent.OPEN_SELECTED_LOG){
+						ShadowMenuItem item = (ShadowMenuItem)event.getMenuObject();
+						item.getLog().activate();
+					}
+				}
+			});
+			
 			menuCards.add(shadowsMenu, MENU_SHADOW);
 			menuCards.add(new OptionsMenu(), MENU_OPTIONS);
 			menuCards.add(new AboutMenu(), MENU_ABOUT);

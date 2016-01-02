@@ -1,12 +1,17 @@
 package com.hexotic.shadow.components.panels.menu;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JPanel;
 
+import com.hexotic.lib.util.StringOps;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
 import com.hexotic.shadow.logs.Log;
@@ -15,26 +20,73 @@ import com.hexotic.shadow.logs.LogListener;
 public class ShadowMenuItem extends JPanel{
 
 	private Log log;
-	private int lineCount = 0;
+	private int lineCount = 1;
+	private Font lgFont;
+	private Font mdFont;
+	private Font smFont;
+	private boolean isHovering = false;
 	
 	public ShadowMenuItem(Log l) {
 		this.setPreferredSize(new Dimension(Constants.SIDEBAR_WIDTH-5, 100));
 		this.setMinimumSize(this.getPreferredSize());
 		this.setMaximumSize(this.getPreferredSize());
-		
 		this.log = l;
 		
 		log.addLogListener(new LogListener(){
 			@Override
-			public void lineAppeneded(String logId, String line, int event, String flag) {
+			public void logEvent(String logId, String line, int event, String flag) {
 				if(event == LogListener.INIT){
-					lineCount = 0;
+					lineCount = 1;
 				} else if(event == LogListener.APPEND){
 					lineCount++;
+				} else if(event == LogListener.NOT_FOUND){
+					lineCount = -1;
+				} else if(event == LogListener.LOG_CLOSED){
+					remove();
 				}
 				refresh();
 			}
 		});
+		
+		smFont = Theme.FOOTER_FONT.deriveFont((float)8.0);
+		mdFont = Theme.FOOTER_FONT.deriveFont((float)12.0);
+		lgFont = Theme.FOOTER_FONT.deriveFont((float)16.0).deriveFont(Font.BOLD);
+		
+		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		bindMouseListener();
+	}
+
+	private void bindMouseListener() {
+		this.addMouseListener(new MouseListener(){
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+			}
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				isHovering = true;
+				refresh();
+			}
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				isHovering = false;
+				refresh();
+			}
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				log.activate();
+			}
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+			}
+		});
+	}
+	
+	public void remove() {
+		
+	}
+	
+	public String getFileName() {
+		return log.getFile().getName();
 	}
 	
 	private void refresh(){
@@ -52,8 +104,12 @@ public class ShadowMenuItem extends JPanel{
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
-		
-		g2d.setColor(Theme.FOOTER_BACKGROUND);
+		int imgWidth = 80;
+		if(isHovering){
+			g2d.setColor(Theme.FOOTER_BACKGROUND.brighter());
+		} else{
+			g2d.setColor(Theme.FOOTER_BACKGROUND);
+		}
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 		
 		g2d.setColor(Theme.FOOTER_BACKGROUND.brighter());
@@ -63,10 +119,20 @@ public class ShadowMenuItem extends JPanel{
 		g2d.drawLine(0, getHeight()-1, getWidth(), getHeight()-1);
 		
 		g2d.setColor(Theme.FOOTER_FONT_COLOR);
-		g2d.drawString(log.getFile().getName(), 20, 20);
-		g2d.drawString("Lines: "+lineCount, 20, 50);
+		g2d.setFont(lgFont);
+		g2d.drawString(log.getFile().getName(), imgWidth, 35);
 		
+		g2d.setFont(mdFont);
+		if(lineCount >= 0){
+			g2d.drawString("Lines: "+lineCount, imgWidth, 55);
+		} else {
+			g2d.setColor(Theme.ERROR_COLOR);
+			g2d.drawString("File Moved or Missing", imgWidth, 55);
+		}
+
+		g2d.setFont(smFont);
+		Dimension size = StringOps.getStringBounds(g2d, smFont, log.getLogId());
 		g2d.setColor(Theme.FOOTER_BACKGROUND.brighter());
-		g2d.drawString(log.getLogId(), 10, getHeight()-5);
+		g2d.drawString(log.getLogId(), getWidth()-size.width, getHeight()-5);
 	}
 }

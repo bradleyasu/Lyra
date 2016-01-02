@@ -1,7 +1,5 @@
 package com.hexotic.shadow.components.panels;
 
-import com.hexotic.shadow.components.controls.LogLine;
-
 public class LogPanelEvent {
 
 	public static final int LINE_REMOVED = 0;
@@ -10,13 +8,15 @@ public class LogPanelEvent {
 	public static final int LINE_UNBOOKMARKED = 3;
 	public static final int HOTKEY_FIND = 4;
 	public static final int HOTKEY_CLOSE = 5;
+	public static final int HOTKEY_SHADOW_MENU = 6;
+	public static final int ACTIVATE_LOG = 7;
 	
 	private int event;
-	private LogLine line;
+	private Object eventObject;
 	
-	public LogPanelEvent(int event, LogLine line) {
+	public LogPanelEvent(int event, Object eventObject) {
 		this.event = event;
-		this.line = line;
+		this.eventObject = eventObject;
 	}
 	
 	public LogPanelEvent(int event){
@@ -27,7 +27,7 @@ public class LogPanelEvent {
 		return event;
 	}
 	
-	public LogLine getLine() {
-		return line;
+	public Object getEventObj() {
+		return eventObject;
 	}
 }
