@@ -2,17 +2,9 @@ package com.hexotic.shadow.components.frames;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.io.File;
-import java.util.TooManyListenersException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JInternalFrame;
@@ -21,15 +13,17 @@ import javax.swing.JScrollPane;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import com.hexotic.lib.ui.panels.SimpleScroller;
-import com.hexotic.shadow.components.controls.LogLine;
-import com.hexotic.shadow.components.panels.FilterBoxListener;
-import com.hexotic.shadow.components.panels.FooterBar;
-import com.hexotic.shadow.components.panels.FooterMenuItemListener;
 import com.hexotic.shadow.components.panels.LogPanel;
+import com.hexotic.shadow.components.panels.LogPanelEvent;
 import com.hexotic.shadow.components.panels.LogPanelListener;
+import com.hexotic.shadow.components.panels.footer.FilterBoxListener;
+import com.hexotic.shadow.components.panels.footer.FooterBar;
+import com.hexotic.shadow.components.panels.footer.FooterMenuItemListener;
+import com.hexotic.shadow.configurations.Flags;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
 import com.hexotic.shadow.logs.Log;
+import com.hexotic.shadow.logs.LogFactory;
 
 public class ShadowFrame extends JInternalFrame{
 
@@ -45,8 +39,10 @@ public class ShadowFrame extends JInternalFrame{
 		this.setSize(Constants.WIDTH-Constants.X_OFFSET, Constants.HEIGHT-Constants.Y_OFFSET);
 		this.setBorder(BorderFactory.createEmptyBorder());
 		((BasicInternalFrameUI) this.getUI()).setNorthPane(null);
-
 	}
+	
+	
+
 	
 	private void buildFrame() {
 		JPanel panel = new JPanel(new BorderLayout());
@@ -109,26 +105,32 @@ public class ShadowFrame extends JInternalFrame{
 		
 		logPanel.addLogPanelListener(new LogPanelListener() {
 			@Override
-			public void lineEvent(int event, LogLine line) {
-				switch(event){
-				case LogPanelListener.LINE_APPENDED:
-					if(footer.getCounters().containsKey(line.getFlag())){
-						footer.getCounters().get(line.getFlag()).increment();
+			public void lineEvent(LogPanelEvent event) {
+				switch(event.getEvent()){
+				case LogPanelEvent.LINE_APPENDED:
+					if(footer.getCounters().containsKey(event.getLine().getFlag())){
+						footer.getCounters().get(event.getLine().getFlag()).increment();
 					}
 					break;
-				case LogPanelListener.LINE_REMOVED:
-					if(footer.getCounters().containsKey(line.getFlag())){
-						footer.getCounters().get(line.getFlag()).decrement();
+				case LogPanelEvent.LINE_REMOVED:
+					if(footer.getCounters().containsKey(event.getLine().getFlag())){
+						footer.getCounters().get(event.getLine().getFlag()).decrement();
 					}
-					if(line.isBookmarked()){
-						footer.getCounters().get(FooterBar.COUNTER_BOOKMARK).decrement();
+					if(event.getLine().isBookmarked()){
+						footer.getCounters().get(Flags.COUNTER_BOOKMARK).decrement();
 					}
 					break;
-				case LogPanelListener.LINE_BOOKMARKED:
-					footer.getCounters().get(FooterBar.COUNTER_BOOKMARK).increment();
+				case LogPanelEvent.LINE_BOOKMARKED:
+					footer.getCounters().get(Flags.COUNTER_BOOKMARK).increment();
 					break;
-				case LogPanelListener.LINE_UNBOOKMARKED:
-					footer.getCounters().get(FooterBar.COUNTER_BOOKMARK).decrement();
+				case LogPanelEvent.LINE_UNBOOKMARKED:
+					footer.getCounters().get(Flags.COUNTER_BOOKMARK).decrement();
+					break;
+				case LogPanelEvent.HOTKEY_FIND:
+					footer.getFilterBox().getField().requestFocus();
+					break;
+				case LogPanelEvent.HOTKEY_CLOSE:
+					closeLog();
 					break;
 				}
 			}
@@ -140,9 +142,20 @@ public class ShadowFrame extends JInternalFrame{
 		
 	}
 	
+	public void closeLog()  {
+		footer.reset();
+		logPanel.reset();
+		revalidate();
+		repaint();
+	}
+	
 	public void openLog(File logFile) {
 		footer.reset();
-		logPanel.setLog(new Log(logFile));
+		Log log = LogFactory.getLog(logFile);
+		logPanel.setLog(log);
+		menu.addItem(log);
+		
+		// Start the shadow process
 		logPanel.getLog().startShadow();
 	}
 	

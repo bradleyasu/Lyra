@@ -22,6 +22,7 @@ import com.hexotic.lib.resource.Resources;
 import com.hexotic.shadow.components.controls.LineEvent;
 import com.hexotic.shadow.components.controls.LineListener;
 import com.hexotic.shadow.components.controls.LogLine;
+import com.hexotic.shadow.configurations.Flags;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
 import com.hexotic.shadow.logs.Log;
@@ -47,6 +48,8 @@ public class LogPanel extends JPanel{
 	
 	private List<LogPanelListener> listeners;
 	
+	private String activeLogId = "";
+	
 	public LogPanel() {
 		panel = this;
 		listeners = new ArrayList<LogPanelListener>();
@@ -65,11 +68,12 @@ public class LogPanel extends JPanel{
 	
 	public void notifyListeners(int event, LogLine line){
 		for(LogPanelListener listener : listeners){
-			listener.lineEvent(event, line);
+			listener.lineEvent(new LogPanelEvent(event, line));
 		}
 	}
 	
-	private void reset() {
+	
+	public void reset() {
 		pauseState = NO_PAUSE;
 		mouseUpLine = -1;
 		mouseDownLine = -1;
@@ -80,16 +84,25 @@ public class LogPanel extends JPanel{
 	}
 	
 	public void setLog(Log log) {
+		activeLogId = log.getLogId();
+		
+		// reset ui any previously open logs
 		reset();
+		
+		// Refresh the UI so that everything is repainted
 		refresh();
+		
 		this.log = log;
-		log.addLogListener(new LogListener() {
-			@Override
-			public void lineAppeneded(String line, int event, String flag) {
-				addLine(line, flag);
-			}
-			
-		});
+		if(!log.isStarted()){
+			log.addLogListener(new LogListener() {
+				@Override
+				public void lineAppeneded(String logId, String line, int event, String flag) {
+					if(activeLogId.equals(logId)){
+						addLine(line, flag);
+					}
+				}
+			});
+		}
 	}
 	
 	public void filter(String text) {
@@ -125,6 +138,10 @@ public class LogPanel extends JPanel{
 					selectBookmarked();
 				}  else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_C){
 					copySelected();
+				} else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_F){
+					notifyListeners(LogPanelEvent.HOTKEY_FIND, null);
+				} else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_W){
+					notifyListeners(LogPanelEvent.HOTKEY_CLOSE, null);
 				} 
 			}
 			@Override
@@ -153,9 +170,9 @@ public class LogPanel extends JPanel{
 		for(LogLine line : lines.values()){
 			if(line.isSelected() && line.isVisible()){
 				if(line.isBookmarked()){
-					notifyListeners(LogPanelListener.LINE_UNBOOKMARKED, line);
+					notifyListeners(LogPanelEvent.LINE_UNBOOKMARKED, line);
 				} else {
-					notifyListeners(LogPanelListener.LINE_BOOKMARKED, line);
+					notifyListeners(LogPanelEvent.LINE_BOOKMARKED, line);
 				}
 				line.setBookmarked(!line.isBookmarked());
 			}
@@ -198,9 +215,33 @@ public class LogPanel extends JPanel{
 			      panel.remove(0);
 				}
 			});
-			notifyListeners(LogPanelListener.LINE_REMOVED, lines.get(removeNext));
+			notifyListeners(LogPanelEvent.LINE_REMOVED, lines.get(removeNext));
 			lines.remove(removeNext);
 			removeNext++;
+		}
+	}
+	
+	public void updateLineFlags() {
+		for(LogLine logLine : lines.values()){
+			// Set the default background
+			logLine.setBackground(Theme.LINE_BACKGROUND);
+			String flag = logLine.getFlag();
+			
+			// update the background for anything that matches flags
+			switch(flag){
+			case Flags.COUNTER_ERROR:
+				logLine.setLineColor(Theme.ERROR_COLOR);
+				break;
+			case Flags.COUNTER_WARNING:
+				logLine.setLineColor(Theme.WARNING_COLOR);
+				break;
+			case Flags.COUNTER_SUCCESS:
+				logLine.setLineColor(Theme.SUCCESS_COLOR);
+				break;
+			case Flags.COUNTER_INFO:
+				logLine.setLineColor(Theme.INFO_COLOR);
+				break;
+			}
 		}
 	}
 	
@@ -209,16 +250,16 @@ public class LogPanel extends JPanel{
 		lines.put(lineCount, logLine);
 		
 		switch(flag){
-		case FooterBar.COUNTER_ERROR:
+		case Flags.COUNTER_ERROR:
 			logLine.setLineColor(Theme.ERROR_COLOR);
 			break;
-		case FooterBar.COUNTER_WARNING:
+		case Flags.COUNTER_WARNING:
 			logLine.setLineColor(Theme.WARNING_COLOR);
 			break;
-		case FooterBar.COUNTER_SUCCESS:
+		case Flags.COUNTER_SUCCESS:
 			logLine.setLineColor(Theme.SUCCESS_COLOR);
 			break;
-		case FooterBar.COUNTER_INFO:
+		case Flags.COUNTER_INFO:
 			logLine.setLineColor(Theme.INFO_COLOR);
 			break;
 		}
@@ -237,7 +278,7 @@ public class LogPanel extends JPanel{
 				}
 			});
 			
-			notifyListeners(LogPanelListener.LINE_REMOVED, lines.get(removeNext));
+			notifyListeners(LogPanelEvent.LINE_REMOVED, lines.get(removeNext));
 			lines.remove(removeNext);
 			removeNext++;
 		}
@@ -278,7 +319,7 @@ public class LogPanel extends JPanel{
 		});
 		
 		// notify everyone else that the line was appended
-		notifyListeners(LogPanelListener.LINE_APPENDED, logLine);
+		notifyListeners(LogPanelEvent.LINE_APPENDED, logLine);
 		
 		lineCount++;
 		

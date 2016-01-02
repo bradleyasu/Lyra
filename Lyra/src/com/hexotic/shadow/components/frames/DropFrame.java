@@ -103,7 +103,7 @@ public class DropFrame extends JInternalFrame{
 				g2d.setColor(Theme.FOOTER_FONT_COLOR);
 				int fileLabelY = 0;
 				int fileLabelX = 20;
-				String header = "Ready to Shadow:";
+				String header = "Drop to Shadow:";
 				Dimension fsize = StringOps.getStringBounds(g2d, font, header);
 				
 				fileLabelY += (int)(fsize.getHeight()+2);

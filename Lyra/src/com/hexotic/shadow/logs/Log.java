@@ -1,6 +1,9 @@
 package com.hexotic.shadow.logs;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +12,7 @@ import java.util.Map;
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListener;
 
-import com.hexotic.shadow.components.panels.FooterBar;
+import com.hexotic.shadow.configurations.Flags;
 import com.hexotic.shadow.constants.Constants;
 
 public class Log {
@@ -20,19 +23,38 @@ public class Log {
 	
 	// Alarm flags - Key is type of flag and value is the text required to trigger flag in line
 	private Map<String, String> flags;
+	private String logId;
 	
 	private boolean started = false;
 	
-	public Log(File log) {
+	public Log(String id, File log) {
 		this.log = log;
+		this.logId = id;
 		listeners = new ArrayList<LogListener>();
 		flags = new HashMap<String, String>();
 		
 		// Add test flags
-		addFlag(FooterBar.COUNTER_WARNING, "WARN");
-		addFlag(FooterBar.COUNTER_ERROR, "ERROR");
-		addFlag(FooterBar.COUNTER_INFO, "DEBUG");
-		addFlag(FooterBar.COUNTER_SUCCESS, "INFO");
+		Map<String, String> flags = Flags.getInstance().getLogFlags(log);
+		for(String flag : flags.keySet()){
+			addFlag(flag, flags.get(flag));
+		}
+
+	}
+	
+	public File getFile() {
+		return log;
+	}
+	
+	
+	public String getLogId() {
+		return logId;
+	}
+	
+	public void close() {
+		if(tailer != null) {
+			tailer.stop();
+		}
+		started = false;
 	}
 	
 	public void addFlag(String type, String query) {
@@ -49,7 +71,7 @@ public class Log {
 	
 	public void notifyListeners(String line, int event, String flag) {
 		for(LogListener listener : listeners) {
-			listener.lineAppeneded(line, event, flag);
+			listener.lineAppeneded(logId, line, event, flag);
 		}
 	}
 	
@@ -63,6 +85,10 @@ public class Log {
 			}
 		}
 		return "";
+	}
+	
+	public boolean isStarted() {
+		return started;
 	}
 	
 	public void startShadow() {
@@ -90,6 +116,10 @@ public class Log {
 			}, Constants.REFRESH_RATE);
 			
 			started = true;
+		} else {
+			// Reload file
+			close();
+			startShadow();
 		}
 	}
 }

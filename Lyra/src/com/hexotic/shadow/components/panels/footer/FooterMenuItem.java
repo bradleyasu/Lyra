@@ -1,4 +1,4 @@
-package com.hexotic.shadow.components.panels;
+package com.hexotic.shadow.components.panels.footer;
 
 import java.awt.Cursor;
 import java.awt.Dimension;

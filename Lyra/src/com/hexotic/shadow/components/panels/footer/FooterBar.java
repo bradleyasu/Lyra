@@ -1,4 +1,4 @@
-package com.hexotic.shadow.components.panels;
+package com.hexotic.shadow.components.panels.footer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -13,18 +13,13 @@ import javax.swing.JPanel;
 
 import com.hexotic.lib.exceptions.ResourceException;
 import com.hexotic.lib.resource.Resources;
+import com.hexotic.shadow.configurations.Flags;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
 
 public class FooterBar extends JPanel{
 
 	// Static counter names
-	public static final String COUNTER_SUCCESS = "0_SUCCESS";
-	public static final String COUNTER_INFO = "1_INFO";
-	public static final String COUNTER_WARNING = "2_WARNING";
-	public static final String COUNTER_ERROR = "3_ERROR";
-	public static final String COUNTER_BOOKMARK = "4_BOOKMARK";
-	
 	
 	private FooterMenuItem primaryMenuItem;
 	private FilterBox filter;
@@ -60,11 +55,11 @@ public class FooterBar extends JPanel{
 	private void setupCounters() {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0,0));
 		panel.setBackground(Theme.FOOTER_BACKGROUND);
-		counters.put(COUNTER_SUCCESS, new FooterCounter(Theme.SUCCESS_COLOR, 0));
-		counters.put(COUNTER_INFO, new FooterCounter(Theme.INFO_COLOR, 0));
-		counters.put(COUNTER_WARNING, new FooterCounter(Theme.WARNING_COLOR, 0));
-		counters.put(COUNTER_ERROR, new FooterCounter(Theme.ERROR_COLOR, 0));
-		counters.put(COUNTER_BOOKMARK, new FooterCounter(Theme.LINE_BOOKMARK_COLOR, 0));
+		counters.put(Flags.COUNTER_SUCCESS, new FooterCounter(Theme.SUCCESS_COLOR, 0));
+		counters.put(Flags.COUNTER_INFO, new FooterCounter(Theme.INFO_COLOR, 0));
+		counters.put(Flags.COUNTER_WARNING, new FooterCounter(Theme.WARNING_COLOR, 0));
+		counters.put(Flags.COUNTER_ERROR, new FooterCounter(Theme.ERROR_COLOR, 0));
+		counters.put(Flags.COUNTER_BOOKMARK, new FooterCounter(Theme.LINE_BOOKMARK_COLOR, 0));
 		
 		for(FooterCounter counter : counters.values()){
 			panel.add(counter);
