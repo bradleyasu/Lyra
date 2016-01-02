@@ -22,6 +22,7 @@ public class ShadowsMenu extends JPanel{
 	
 	private ShadowLogs menuItems;
 	private List<MenuListener> listeners;
+	private FilterBox filterBox;
 	
 	public ShadowsMenu(){
 		this.setBackground(Theme.FOOTER_BACKGROUND_DARKER);
@@ -43,15 +44,16 @@ public class ShadowsMenu extends JPanel{
 		
 		
 		this.add(scroller, BorderLayout.CENTER);
-		FilterBox filterBox = new FilterBox();
+		filterBox = new FilterBox();
 		filterBox.addFilterBoxListener(new FilterBoxListener() {
 			@Override
 			public void filterChanged(String filter, boolean hasFocus, boolean canceled) {
 				if(canceled){
-					System.out.println("Close Menu");
+					notifyListeners(MenuEvent.CLOSE_MENU, null);
 				} else if(!hasFocus) {
 					ShadowMenuItem item = menuItems.selectFirstVisibleItem();
 					notifyListeners(MenuEvent.OPEN_SELECTED_LOG, item);
+					notifyListeners(MenuEvent.CLOSE_MENU, null);
 				} else {
 					menuItems.filterItems(filter);
 				}
@@ -73,6 +75,13 @@ public class ShadowsMenu extends JPanel{
 	
 	public ShadowLogs getItems() {
 		return menuItems;
+	}
+	
+	public void focusFilterBox() {
+		if(filterBox != null){
+			filterBox.getField().setText("");
+			filterBox.getField().requestFocus();
+		}
 	}
 	
 	public class ShadowLogs extends JPanel {

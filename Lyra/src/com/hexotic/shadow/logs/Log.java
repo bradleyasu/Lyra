@@ -1,9 +1,6 @@
 package com.hexotic.shadow.logs;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +23,7 @@ public class Log {
 	private String logId;
 	
 	private boolean started = false;
+	private boolean isActivated = false;
 	
 	public Log(String id, File log) {
 		this.log = log;
@@ -50,8 +48,30 @@ public class Log {
 		return logId;
 	}
 	
+	public boolean isActivated() {
+		return isActivated;
+	}
+	
+	public void setActive(boolean active){
+		this.isActivated = active;
+	}
+	
 	public void activate() {
-		notifyListeners("", LogListener.MAKE_ACTIVE, "");
+		if(!isActivated){
+			for(LogListener listener : listeners){
+				listener.logActivated(getLogId());
+			}
+			isActivated = true;
+		}
+	}
+	
+	public void deactivate() {
+		if(isActivated){
+			for(LogListener listener : listeners){
+				listener.logDeactivated(getLogId());
+			}
+			isActivated = false;
+		}
 	}
 	
 	public void close() {
@@ -59,7 +79,9 @@ public class Log {
 			tailer.stop();
 		}
 		started = false;
-		notifyListeners("", LogListener.LOG_CLOSED, "");
+		for(LogListener listener : listeners){
+			listener.logClosed(getLogId());
+		}
 	}
 	
 	public void addFlag(String type, String query) {
@@ -72,12 +94,6 @@ public class Log {
 	
 	public void addLogListener(LogListener listener){
 		listeners.add(listener);
-	}
-	
-	public void notifyListeners(String line, int event, String flag) {
-		for(LogListener listener : listeners) {
-			listener.logEvent(logId, line, event, flag);
-		}
 	}
 	
 	/**
@@ -101,14 +117,19 @@ public class Log {
 			tailer = Tailer.create(log, new TailerListener() {
 				@Override
 				public void fileNotFound() {
-					notifyListeners("", LogListener.NOT_FOUND, "");
+					for(LogListener listener : listeners){
+						listener.logNotFound(logId);
+					}
 				}
 				@Override
 				public void fileRotated() {
+					System.out.println("Rotated");
 				}
 				@Override
 				public void handle(String line) {
-					notifyListeners(line, LogListener.APPEND, checkFlags(line));
+					for(LogListener listener : listeners){
+						listener.lineAppended(new LogEvent(getLogId(), line, LogEvent.APPEND, checkFlags(line)));
+					}
 				}
 				@Override
 				public void handle(Exception arg0) {
@@ -116,7 +137,9 @@ public class Log {
 				}
 				@Override
 				public void init(Tailer arg0) {
-					notifyListeners("", LogListener.INIT, "");
+					for(LogListener listener : listeners){
+						listener.logOpened(getLogId());
+					}
 				}
 				
 			}, Constants.REFRESH_RATE);

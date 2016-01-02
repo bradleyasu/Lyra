@@ -1,8 +1,10 @@
 package com.hexotic.shadow.components.panels.menu;
 
 public class MenuEvent {
-
+	
+	public static final int CLOSE_MENU = 0;
 	public static final int OPEN_SELECTED_LOG = 1; 
+	
 	
 	private Object menuObject;
 	private int event;

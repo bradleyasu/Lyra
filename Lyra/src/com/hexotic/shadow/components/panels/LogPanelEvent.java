@@ -10,6 +10,7 @@ public class LogPanelEvent {
 	public static final int HOTKEY_CLOSE = 5;
 	public static final int HOTKEY_SHADOW_MENU = 6;
 	public static final int ACTIVATE_LOG = 7;
+	public static final int DEACTIVATE_LOG = 8;
 	
 	private int event;
 	private Object eventObject;

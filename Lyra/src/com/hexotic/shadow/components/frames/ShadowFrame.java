@@ -42,7 +42,6 @@ public class ShadowFrame extends JInternalFrame{
 		((BasicInternalFrameUI) this.getUI()).setNorthPane(null);
 	}
 	
-	
 
 	
 	private void buildFrame() {
@@ -176,9 +175,11 @@ public class ShadowFrame extends JInternalFrame{
 		footer.getPrimaryMenuItem().addFooterMenuItemListener(new FooterMenuItemListener(){
 			@Override
 			public void itemActivated(boolean activated) {
-				menu.setVisible(activated);
+				menu.showMenu(activated);
 			}
 		});
+		
+		this.menu.setShadowButton(footer.getPrimaryMenuItem());
 	}
 	
 }

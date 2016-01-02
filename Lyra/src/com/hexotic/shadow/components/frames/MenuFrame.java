@@ -11,6 +11,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
+import com.hexotic.shadow.components.panels.footer.FooterMenuItem;
 import com.hexotic.shadow.components.panels.menu.AboutMenu;
 import com.hexotic.shadow.components.panels.menu.MenuControlPanel;
 import com.hexotic.shadow.components.panels.menu.MenuControlPanelListener;
@@ -26,6 +27,8 @@ import com.hexotic.shadow.logs.Log;
 public class MenuFrame extends JInternalFrame{
 	
 	private MenuPanel innerPanel;
+	private FooterMenuItem shadowButton;
+	
 	public MenuFrame(){
 		this.setSize(Constants.SIDEBAR_WIDTH, Constants.SIDEBAR_HEIGHT-Constants.Y_OFFSET-20-10);
 		this.setLocation(0,Constants.FOOTER_SIZE/2);
@@ -36,8 +39,23 @@ public class MenuFrame extends JInternalFrame{
 		this.add(innerPanel, BorderLayout.CENTER);
 	}
 	
+	public void setShadowButton(FooterMenuItem button){
+		shadowButton = button;
+	}
+	
 	public void addItem(Log log){
 		innerPanel.openLog(log);
+	}
+	
+	public void closeMenu(){
+		if(shadowButton != null){
+			shadowButton.click();
+		}
+	}
+	
+	public void showMenu(boolean visible){
+		this.setVisible(visible);
+		innerPanel.reset();
 	}
 	
 	class MenuPanel extends JPanel {
@@ -82,6 +100,11 @@ public class MenuFrame extends JInternalFrame{
 			setupCards();
 		}
 		
+		public void reset() {
+			cardLayout.show(menuCards, MENU_SHADOW);
+			shadowsMenu.focusFilterBox();
+		}
+		
 		private void setupCards() {
 			cardLayout = new CardLayout();
 			menuCards = new JPanel(cardLayout);
@@ -92,6 +115,8 @@ public class MenuFrame extends JInternalFrame{
 					if(event.getMenuEventType() == MenuEvent.OPEN_SELECTED_LOG){
 						ShadowMenuItem item = (ShadowMenuItem)event.getMenuObject();
 						item.getLog().activate();
+					} else if(event.getMenuEventType() == MenuEvent.CLOSE_MENU){
+						closeMenu();
 					}
 				}
 			});

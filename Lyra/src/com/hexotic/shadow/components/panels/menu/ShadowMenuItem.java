@@ -15,6 +15,7 @@ import com.hexotic.lib.util.StringOps;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
 import com.hexotic.shadow.logs.Log;
+import com.hexotic.shadow.logs.LogEvent;
 import com.hexotic.shadow.logs.LogListener;
 
 public class ShadowMenuItem extends JPanel{
@@ -25,6 +26,7 @@ public class ShadowMenuItem extends JPanel{
 	private Font mdFont;
 	private Font smFont;
 	private boolean isHovering = false;
+	private boolean isActive = false;
 	
 	public ShadowMenuItem(Log l) {
 		this.setPreferredSize(new Dimension(Constants.SIDEBAR_WIDTH-5, 100));
@@ -33,18 +35,36 @@ public class ShadowMenuItem extends JPanel{
 		this.log = l;
 		
 		log.addLogListener(new LogListener(){
+
 			@Override
-			public void logEvent(String logId, String line, int event, String flag) {
-				if(event == LogListener.INIT){
-					lineCount = 1;
-				} else if(event == LogListener.APPEND){
-					lineCount++;
-				} else if(event == LogListener.NOT_FOUND){
-					lineCount = -1;
-				} else if(event == LogListener.LOG_CLOSED){
-					remove();
-				}
-				refresh();
+			public void lineAppended(LogEvent event) {
+				lineCount++;
+			}
+
+			@Override
+			public void logClosed(String logId) {
+				remove();
+			}
+
+			@Override
+			public void logOpened(String logId) {
+				lineCount = 0;
+			}
+
+			@Override
+			public void logActivated(String logId) {
+				isActive = true;
+			}
+
+			@Override
+			public void logNotFound(String logId) {
+				lineCount = -1;
+				
+			}
+
+			@Override
+			public void logDeactivated(String logId) {
+				isActive = false;
 			}
 		});
 		
@@ -127,12 +147,17 @@ public class ShadowMenuItem extends JPanel{
 			g2d.drawString("Lines: "+lineCount, imgWidth, 55);
 		} else {
 			g2d.setColor(Theme.ERROR_COLOR);
-			g2d.drawString("File Moved or Missing", imgWidth, 55);
+			g2d.drawString("File Moved, Missing, or Invalid file", imgWidth, 55);
 		}
 
 		g2d.setFont(smFont);
 		Dimension size = StringOps.getStringBounds(g2d, smFont, log.getLogId());
 		g2d.setColor(Theme.FOOTER_BACKGROUND.brighter());
 		g2d.drawString(log.getLogId(), getWidth()-size.width, getHeight()-5);
+		
+		if(log.isActivated()){
+			g2d.setColor(Theme.FOOTER_FONT_COLOR);
+			g2d.fillRect(0,0,5,getHeight()-2);
+		}
 	}
 }

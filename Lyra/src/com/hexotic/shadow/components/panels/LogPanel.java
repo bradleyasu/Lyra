@@ -26,6 +26,7 @@ import com.hexotic.shadow.configurations.Flags;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
 import com.hexotic.shadow.logs.Log;
+import com.hexotic.shadow.logs.LogEvent;
 import com.hexotic.shadow.logs.LogListener;
 
 public class LogPanel extends JPanel{
@@ -81,10 +82,17 @@ public class LogPanel extends JPanel{
 		lineCount = 0;
 		panel.removeAll();
 		lines.clear();
+		
+		if(this.log != null){
+			this.log.deactivate();
+		}
 	}
 	
 	public void setLog(Log log) {
+		this.requestFocus();
 		activeLogId = log.getLogId();
+		
+		log.setActive(true);
 		
 		// reset ui any previously open logs
 		reset();
@@ -95,15 +103,40 @@ public class LogPanel extends JPanel{
 		this.log = log;
 		if(!log.isStarted()){
 			log.addLogListener(new LogListener() {
+
 				@Override
-				public void logEvent(String logId, String line, int event, String flag) {
-					if(event == LogListener.APPEND || event == LogListener.INIT){
-						if(activeLogId.equals(logId)){
-							addLine(line, flag);
-						}
-					} else if(event == LogListener.MAKE_ACTIVE){
-						notifyListeners(LogPanelEvent.ACTIVATE_LOG, logId);
-					}
+				public void lineAppended(LogEvent event) {
+					if(activeLogId.equals(event.getLogId())){
+						addLine(event.getLine(), event.getFlag());
+					}					
+				}
+
+				@Override
+				public void logClosed(String logId) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void logOpened(String logId) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void logActivated(String logId) {
+					notifyListeners(LogPanelEvent.ACTIVATE_LOG, logId);
+				}
+
+				@Override
+				public void logNotFound(String logId) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void logDeactivated(String logId) {
+					notifyListeners(LogPanelEvent.DEACTIVATE_LOG, logId);
 				}
 			});
 		}
