@@ -101,6 +101,7 @@ public class MenuFrame extends JInternalFrame{
 		}
 		
 		public void reset() {
+			controlPanel.setActive(MENU_SHADOW);
 			cardLayout.show(menuCards, MENU_SHADOW);
 			shadowsMenu.focusFilterBox();
 		}
@@ -131,7 +132,7 @@ public class MenuFrame extends JInternalFrame{
 		}
 		
 		public void openLog(Log log) {
-			shadowsMenu.getItems().addItem(new ShadowMenuItem(log));
+			shadowsMenu.getItems().addItem(log);
 		}
 		
 		@Override

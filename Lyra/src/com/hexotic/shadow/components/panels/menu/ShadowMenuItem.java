@@ -5,12 +5,15 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JPanel;
 
+import com.hexotic.lib.exceptions.ResourceException;
+import com.hexotic.lib.resource.Resources;
 import com.hexotic.lib.util.StringOps;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
@@ -18,8 +21,10 @@ import com.hexotic.shadow.logs.Log;
 import com.hexotic.shadow.logs.LogEvent;
 import com.hexotic.shadow.logs.LogListener;
 
-public class ShadowMenuItem extends JPanel{
+public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>{
 
+	private int itemId = 0;
+	
 	private Log log;
 	private int lineCount = 1;
 	private Font lgFont;
@@ -27,8 +32,12 @@ public class ShadowMenuItem extends JPanel{
 	private Font smFont;
 	private boolean isHovering = false;
 	private boolean isActive = false;
+
+	private Image icon;
+	private Image errorIcon;
 	
-	public ShadowMenuItem(Log l) {
+	public ShadowMenuItem(int id, Log l) {
+		itemId = id;
 		this.setPreferredSize(new Dimension(Constants.SIDEBAR_WIDTH-5, 100));
 		this.setMinimumSize(this.getPreferredSize());
 		this.setMaximumSize(this.getPreferredSize());
@@ -74,6 +83,25 @@ public class ShadowMenuItem extends JPanel{
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		bindMouseListener();
+		getIcon();
+	}
+	
+	private void getIcon() {
+		String iconName = "default.png";
+		if(log.getFile().getName().toLowerCase().endsWith(".csv")){
+			iconName = "csv.png";
+		} else if(log.getFile().getName().toLowerCase().endsWith(".txt")) {
+			iconName = "text.png";
+		} else if(log.getFile().getName().toLowerCase().endsWith(".png") || 
+				log.getFile().getName().toLowerCase().endsWith(".gif") ||
+				log.getFile().getName().toLowerCase().endsWith(".bmp") ||
+				log.getFile().getName().toLowerCase().endsWith(".jpg")) {
+			iconName = "image.png";
+		} 
+		try {
+			icon = Resources.getInstance().getImage("fileTypes/"+iconName);
+			errorIcon = Resources.getInstance().getImage("fileTypes/fileError.png");
+		} catch (ResourceException e) { }
 	}
 
 	private void bindMouseListener() {
@@ -101,6 +129,10 @@ public class ShadowMenuItem extends JPanel{
 		});
 	}
 	
+	public int getId() {
+		return itemId;
+	}
+	
 	public void remove() {
 		
 	}
@@ -124,30 +156,45 @@ public class ShadowMenuItem extends JPanel{
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
-		int imgWidth = 80;
+		int imgWidth = 85;
 		if(isHovering){
 			g2d.setColor(Theme.FOOTER_BACKGROUND.brighter());
 		} else{
 			g2d.setColor(Theme.FOOTER_BACKGROUND);
 		}
+		// Draw background color
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 		
+		// Draw header line
 		g2d.setColor(Theme.FOOTER_BACKGROUND.brighter());
 		g2d.drawLine(0,0,getWidth(), 0);
 		
+		// Draw footer line
 		g2d.setColor(Theme.FOOTER_BACKGROUND.darker());
 		g2d.drawLine(0, getHeight()-1, getWidth(), getHeight()-1);
 		
+		// Draw icon
+		
+		// draw labels
 		g2d.setColor(Theme.FOOTER_FONT_COLOR);
 		g2d.setFont(lgFont);
-		g2d.drawString(log.getFile().getName(), imgWidth, 35);
+		g2d.drawString(log.getFile().getName(), imgWidth, 40);
 		
 		g2d.setFont(mdFont);
 		if(lineCount >= 0){
-			g2d.drawString("Lines: "+lineCount, imgWidth, 55);
+			g2d.drawImage(icon, 10, 10,null);
+			g2d.drawString("Lines: "+lineCount, imgWidth, 60);
+			if(log.isActivated()){
+				g2d.fillRect(0,0,5,getHeight()-2);
+			}
 		} else {
+			g2d.drawImage(errorIcon, 10, 10,null);
 			g2d.setColor(Theme.ERROR_COLOR);
-			g2d.drawString("File Moved, Missing, or Invalid file", imgWidth, 55);
+			g2d.drawString("File Moved, Missing, or Not Readable", imgWidth, 60);
+			
+			if(log.isActivated()){
+				g2d.fillRect(0,0,5,getHeight()-2);
+			}
 		}
 
 		g2d.setFont(smFont);
@@ -155,9 +202,10 @@ public class ShadowMenuItem extends JPanel{
 		g2d.setColor(Theme.FOOTER_BACKGROUND.brighter());
 		g2d.drawString(log.getLogId(), getWidth()-size.width, getHeight()-5);
 		
-		if(log.isActivated()){
-			g2d.setColor(Theme.FOOTER_FONT_COLOR);
-			g2d.fillRect(0,0,5,getHeight()-2);
-		}
+	}
+
+	@Override
+	public int compareTo(ShadowMenuItem item) {
+		return item.getId() - getId();
 	}
 }
