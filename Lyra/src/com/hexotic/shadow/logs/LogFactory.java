@@ -22,7 +22,11 @@ public class LogFactory {
 			if(logs.containsKey(id)){
 				log = logs.get(id);
 			} else {
-				log = new Log(id, logLocation);
+				if(logLocation.getName().endsWith(".sshadow")){
+					log = generateSshLog(id, logLocation);
+				} else {
+					log = new LocalLog(id, logLocation);
+				}
 				logs.put(id, log);
 			}
 		} catch (NoSuchAlgorithmException e) {
@@ -30,6 +34,11 @@ public class LogFactory {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
+		return log;
+	}
+	
+	private static Log generateSshLog(String id, File sshadowFile){
+		Log log = new SshLog(id, sshadowFile);
 		return log;
 	}
 	

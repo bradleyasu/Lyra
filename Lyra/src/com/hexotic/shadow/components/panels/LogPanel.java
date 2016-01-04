@@ -179,7 +179,7 @@ public class LogPanel extends JPanel{
 					notifyListeners(LogPanelEvent.HOTKEY_FIND, null);
 				} else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_W){
 					notifyListeners(LogPanelEvent.HOTKEY_CLOSE, null);
-				} else if(key.getKeyCode() == KeyEvent.VK_SPACE){
+				} else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_S){
 					notifyListeners(LogPanelEvent.HOTKEY_SHADOW_MENU, null);
 				} 
 			}

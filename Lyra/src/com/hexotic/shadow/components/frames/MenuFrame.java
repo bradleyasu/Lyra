@@ -115,7 +115,9 @@ public class MenuFrame extends JInternalFrame{
 				public void menuActionPerformed(MenuEvent event) {
 					if(event.getMenuEventType() == MenuEvent.OPEN_SELECTED_LOG){
 						ShadowMenuItem item = (ShadowMenuItem)event.getMenuObject();
-						item.getLog().activate();
+						if(item != null){
+							item.getLog().activate();
+						}
 					} else if(event.getMenuEventType() == MenuEvent.CLOSE_MENU){
 						closeMenu();
 					}

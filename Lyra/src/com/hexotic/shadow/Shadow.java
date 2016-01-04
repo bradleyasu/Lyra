@@ -54,9 +54,9 @@ public class Shadow extends JFrame{
 		/* Build DropFrame used to display to the user the item is being dropped */
 		dropFrame = new DropFrame();
 		
-		rootPane.add(mainFrame); 
-		rootPane.add(menuFrame);
-		rootPane.add(dropFrame);
+		rootPane.add(mainFrame, new Integer(5)); 
+		rootPane.add(menuFrame, new Integer(10));
+		rootPane.add(dropFrame, new Integer(15));
 		
 		
 		mainFrame.setVisible(true);

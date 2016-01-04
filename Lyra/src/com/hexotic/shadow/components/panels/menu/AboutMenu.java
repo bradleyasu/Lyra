@@ -16,7 +16,7 @@ public class AboutMenu extends JPanel{
 	private Image logo;
 	
 	public AboutMenu(){
-		this.setBackground(Theme.FOOTER_BACKGROUND_DARKER);
+		this.setBackground(Theme.FOOTER_BACKGROUND);
 		
 		try {
 			logo = Resources.getInstance().getImage("icon_lg.png");

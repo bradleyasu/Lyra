@@ -19,7 +19,7 @@ public class Flags {
 		
 	}
 	
-	public Map<String, String> getLogFlags(File log) {
+	public Map<String, String> getLogFlags(String logId) {
 		Map<String, String> flags = new TreeMap<String, String>();
 		
 		return flags;

@@ -26,15 +26,17 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 	private int itemId = 0;
 	
 	private Log log;
-	private int lineCount = 1;
+	private int lineCount = 0;
 	private Font lgFont;
 	private Font mdFont;
 	private Font smFont;
 	private boolean isHovering = false;
 	private boolean isActive = false;
+	private boolean isRemote = false;
 
 	private Image icon;
 	private Image errorIcon;
+	private Image remoteIcon;
 	
 	public ShadowMenuItem(int id, Log l) {
 		itemId = id;
@@ -43,37 +45,46 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 		this.setMaximumSize(this.getPreferredSize());
 		this.log = l;
 		
+		if(log.getFile().getName().endsWith(".sshadow")){
+			isRemote = true;
+		}
+		
 		log.addLogListener(new LogListener(){
 
 			@Override
 			public void lineAppended(LogEvent event) {
 				lineCount++;
+				refresh();
 			}
 
 			@Override
 			public void logClosed(String logId) {
 				remove();
+				refresh();
 			}
 
 			@Override
 			public void logOpened(String logId) {
 				lineCount = 0;
+				refresh();
 			}
 
 			@Override
 			public void logActivated(String logId) {
 				isActive = true;
+				refresh();
 			}
 
 			@Override
 			public void logNotFound(String logId) {
 				lineCount = -1;
-				
+				refresh();
 			}
 
 			@Override
 			public void logDeactivated(String logId) {
 				isActive = false;
+				
 			}
 		});
 		
@@ -83,10 +94,10 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		bindMouseListener();
-		getIcon();
+		getIcons();
 	}
 	
-	private void getIcon() {
+	private void getIcons() {
 		String iconName = "default.png";
 		if(log.getFile().getName().toLowerCase().endsWith(".csv")){
 			iconName = "csv.png";
@@ -101,6 +112,7 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 		try {
 			icon = Resources.getInstance().getImage("fileTypes/"+iconName);
 			errorIcon = Resources.getInstance().getImage("fileTypes/fileError.png");
+			remoteIcon = Resources.getInstance().getImage("flat_remote.png");
 		} catch (ResourceException e) { }
 	}
 
@@ -178,10 +190,17 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 		// draw labels
 		g2d.setColor(Theme.FOOTER_FONT_COLOR);
 		g2d.setFont(lgFont);
-		g2d.drawString(log.getFile().getName(), imgWidth, 40);
+		g2d.drawString(log.getFile().getName().replace(".sshadow", ""), imgWidth, 40);
 		
 		g2d.setFont(mdFont);
-		if(lineCount >= 0){
+		
+		if(lineCount == 0){
+			g2d.drawImage(icon, 10, 10,null);
+			g2d.drawString("Connecting...", imgWidth, 60);
+			if(log.isActivated()){
+				g2d.fillRect(0,0,5,getHeight()-2);
+			}
+		}else if(lineCount > 0){
 			g2d.drawImage(icon, 10, 10,null);
 			g2d.drawString("Lines: "+lineCount, imgWidth, 60);
 			if(log.isActivated()){
@@ -190,13 +209,20 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 		} else {
 			g2d.drawImage(errorIcon, 10, 10,null);
 			g2d.setColor(Theme.ERROR_COLOR);
-			g2d.drawString("File Moved, Missing, or Not Readable", imgWidth, 60);
+			if(isRemote){
+				g2d.drawString("Remote Connection Failure", imgWidth, 60);
+			} else {
+				g2d.drawString("File Moved, Missing, or Not Readable", imgWidth, 60);
+			}
 			
 			if(log.isActivated()){
 				g2d.fillRect(0,0,5,getHeight()-2);
 			}
 		}
-
+		if(isRemote) {
+			g2d.drawImage(remoteIcon, getWidth()-remoteIcon.getWidth(null)-5, 55, null);
+		}
+		
 		g2d.setFont(smFont);
 		Dimension size = StringOps.getStringBounds(g2d, smFont, log.getLogId());
 		g2d.setColor(Theme.FOOTER_BACKGROUND.brighter());

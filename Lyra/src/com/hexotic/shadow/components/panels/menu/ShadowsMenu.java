@@ -77,7 +77,7 @@ public class ShadowsMenu extends JPanel{
 	
 	private void loadResources() {
 		try {
-			notFoundIcon = Resources.getInstance().getImage("fileTypes/cat.png");
+			notFoundIcon = Resources.getInstance().getImage("fileTypes/question.png");
 		} catch (ResourceException e) {
 			e.printStackTrace();
 		}
@@ -122,7 +122,7 @@ public class ShadowsMenu extends JPanel{
 			ShadowMenuItem item = new ShadowMenuItem(items.size(), log);
 			if(!items.containsKey(log.getLogId())){
 				items.put(log.getLogId(), item);
-				this.add(item);
+				this.add(item, 0);
 				visibleCount++;
 			}
 		}
@@ -156,6 +156,8 @@ public class ShadowsMenu extends JPanel{
 					visibleCount++;
 				}
 			}
+			revalidate();
+			repaint();
 		}
 		
 		@Override
@@ -173,7 +175,7 @@ public class ShadowsMenu extends JPanel{
 				g2d.drawString("updated live as the file updates on disk.", 20, 120);
 			} else if(!items.isEmpty() && visibleCount == 0){
 				g2d.drawImage(notFoundIcon, getWidth()/2-notFoundIcon.getWidth(null)/2, 100, null);
-				g2d.drawString("Nothing open matches your intense filter", 45, 200);
+				g2d.drawString("Nothing open matches your filter", 65, 200);
 				
 			}
 		}
