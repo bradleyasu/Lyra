@@ -14,6 +14,10 @@ public class Theme {
 	public static Color SIDEBAR_BACKGROUND = new Color(0xf4f4f4);
 	public static Color SHADOW_COLOR = new Color(0x3b3b3b);
 	
+	public static Color DIALOG_COLOR = new Color(0xECF0F1);
+	public static Color DIALOG_BORDER_COLOR = new Color(0x16A085);
+	
+	
 	public static Color LINE_NUMBER_COLOR = new Color(0x2C3E50);
 	public static Color LINE_NUMBER_BACKGROUND = new Color(0xBDC3C7);
 	public static int   LINE_NUMBER_WIDTH = 20;

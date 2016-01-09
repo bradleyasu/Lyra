@@ -10,6 +10,8 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.File;
@@ -18,14 +20,21 @@ import java.util.List;
 import java.util.TooManyListenersException;
 
 import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import com.hexotic.lib.exceptions.ResourceException;
 import com.hexotic.lib.resource.Resources;
 import com.hexotic.lib.util.WinOps;
+import com.hexotic.shadow.components.frames.BlurFrame;
+import com.hexotic.shadow.components.frames.DialogEvent;
+import com.hexotic.shadow.components.frames.DialogListener;
 import com.hexotic.shadow.components.frames.DropFrame;
 import com.hexotic.shadow.components.frames.MenuFrame;
 import com.hexotic.shadow.components.frames.ShadowFrame;
+import com.hexotic.shadow.components.frames.SshFrame;
 import com.hexotic.shadow.constants.Constants;
 
 public class Shadow extends JFrame{
@@ -33,10 +42,13 @@ public class Shadow extends JFrame{
 	private JDesktopPane rootPane;
 	private ShadowFrame mainFrame;
 	private DropFrame dropFrame;
+	private BlurFrame blurFrame;
+	private SshFrame sshFrame;
 	
 	private MenuFrame menuFrame;
 	
 	public Shadow() {
+		
 		this.setTitle(Constants.APP_NAME+" "+Constants.VERSION+" - "+Constants.APP_COMPANY);
 		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -51,6 +63,39 @@ public class Shadow extends JFrame{
 		/* Build Main Menu */
 		menuFrame = new MenuFrame();
 		
+		/* Build Dialog for Creating SSH Connections */
+		sshFrame = new SshFrame();
+		
+		/* Build a "Blur Panel" that will be displayed when prompt boxes are open */
+		blurFrame = new BlurFrame();
+		
+		// The menu has buttons that allow logs to be opened, here's where those actions get set
+		// This is happening here so that we can call the openLogs methods directly
+		menuFrame.setOpenActions(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				blurFrame.createBlur(getThis().getContentPane());
+				blurFrame.setVisible(true);
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setDialogTitle("Open a File to Shadow");
+				if (fileChooser.showOpenDialog(getThis()) == JFileChooser.APPROVE_OPTION) {
+				  File file = fileChooser.getSelectedFile();
+				  openFile(file);
+				  menuFrame.closeMenu();
+				}
+				blurFrame.setVisible(false);
+			}
+			
+		}, new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				blurFrame.createBlur(getThis().getContentPane());
+				blurFrame.setVisible(true);
+				sshFrame.reset();
+				sshFrame.setVisible(true);
+			}
+		});
+		
 		/* Build DropFrame used to display to the user the item is being dropped */
 		dropFrame = new DropFrame();
 		
@@ -58,10 +103,16 @@ public class Shadow extends JFrame{
 		rootPane.add(menuFrame, new Integer(10));
 		rootPane.add(dropFrame, new Integer(15));
 		
+		// anything that is a prompt should be displayed at 35 or higher
+		rootPane.add(blurFrame, new Integer(30));
+		rootPane.add(sshFrame, new Integer(35));
+		
 		
 		mainFrame.setVisible(true);
 		menuFrame.setVisible(false);
 		dropFrame.setVisible(false);
+		blurFrame.setVisible(false);
+		sshFrame.setVisible(false);
 		
 		
 		// Register the menu with the main frame so that it will be visible 
@@ -82,11 +133,20 @@ public class Shadow extends JFrame{
 				mainFrame.setSize(targetWidth, targetHeight);
 				mainFrame.setLocation(0,0);
 				
+				blurFrame.setSize(targetWidth, targetHeight);
+				blurFrame.setLocation(0,0);
+				
 				dropFrame.setSize(targetWidth, targetHeight);
 				dropFrame.setLocation(0,0);
 				
 				menuFrame.setSize(Constants.SIDEBAR_WIDTH, targetHeight-Constants.FOOTER_SIZE-(Constants.FOOTER_SIZE/2));
 				menuFrame.setLocation(0,Constants.FOOTER_SIZE/2);
+				
+				sshFrame.setLocation(targetWidth/2 - sshFrame.getWidth()/2, targetHeight/2 - sshFrame.getHeight()/2);
+				
+				if(blurFrame.isVisible()){
+					blurFrame.setVisible(false);
+				}
 			}
 
 			@Override
@@ -102,6 +162,21 @@ public class Shadow extends JFrame{
 			}
 		});
 		
+		sshFrame.addDialogListener(new DialogListener(){
+			@Override
+			public void eventPerformed(DialogEvent event) {
+				if(event.getEvent() == DialogEvent.CANCELLED){
+					sshFrame.setVisible(false);
+					blurFrame.setVisible(false);
+				} else if(event.getEvent() == DialogEvent.FILE_SUBMIT){
+					openFile(event.getFile());
+					sshFrame.setVisible(false);
+					blurFrame.setVisible(false);
+					menuFrame.closeMenu();
+				}
+			}
+		});
+		
 		pack();
 		this.setVisible(true);
 		WinOps.centreWindow(this);
@@ -114,7 +189,9 @@ public class Shadow extends JFrame{
 		}
 	}
 	
-	
+	private Shadow getThis(){
+		return this;
+	}
 	
 	private void setupDragAndDrop() throws TooManyListenersException {
 		DropTarget dropTarget = new DropTarget(this, DnDConstants.ACTION_COPY_OR_MOVE, null);
@@ -183,6 +260,23 @@ public class Shadow extends JFrame{
 	}
 	
 	public static void main(String[] args) {
+		 try {
+			 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    } 
+	    catch (UnsupportedLookAndFeelException e) {
+	       // handle exception
+	    }
+	    catch (ClassNotFoundException e) {
+	       // handle exception
+	    }
+	    catch (InstantiationException e) {
+	       // handle exception
+	    }
+	    catch (IllegalAccessException e) {
+	       // handle exception
+	    }
+		
+		
 		 java.awt.EventQueue.invokeLater(new Runnable() {
 	          public void run() {
 	               new Shadow();

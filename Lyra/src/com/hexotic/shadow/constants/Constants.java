@@ -28,4 +28,6 @@ public class Constants {
 	/* Log settings */
 	public static final int LOG_MAX = 2000;
 	public static final int REFRESH_RATE = 100; // Milliseconds
+	
+	public static final String SSH_DIR = System.getenv("APPDATA") +"\\Shadow\\connections";
 }

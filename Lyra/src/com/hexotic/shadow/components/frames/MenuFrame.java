@@ -5,6 +5,7 @@ import java.awt.CardLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JInternalFrame;
@@ -56,6 +57,10 @@ public class MenuFrame extends JInternalFrame{
 	public void showMenu(boolean visible){
 		this.setVisible(visible);
 		innerPanel.reset();
+	}
+	
+	public void setOpenActions(ActionListener openLocal, ActionListener openSsh){
+		innerPanel.setOpenActions(openLocal, openSsh);
 	}
 	
 	class MenuPanel extends JPanel {
@@ -131,6 +136,11 @@ public class MenuFrame extends JInternalFrame{
 			cardLayout.show(menuCards, MENU_SHADOW);
 			
 			this.add(menuCards, BorderLayout.CENTER);
+		}
+		
+		public void setOpenActions(ActionListener openLocal, ActionListener openSsh){
+			shadowsMenu.setOpenAction(openLocal);
+			shadowsMenu.setOpenSshAction(openSsh);
 		}
 		
 		public void openLog(Log log) {

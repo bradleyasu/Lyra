@@ -3,11 +3,13 @@ package com.hexotic.shadow.components.panels.menu;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -33,6 +36,8 @@ public class ShadowsMenu extends JPanel{
 	private FilterBox filterBox;
 	private Image notFoundIcon;
 	private Font font;
+	private JButton openLocal;
+	private JButton openSsh;
 	
 	public ShadowsMenu(){
 		this.setBackground(Theme.FOOTER_BACKGROUND_DARKER);
@@ -40,7 +45,21 @@ public class ShadowsMenu extends JPanel{
 		listeners = new ArrayList<MenuListener>();
 		
 		menuItems = new ShadowLogs();
+
+		// Create a button panel for opening logs
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		buttonPanel.setPreferredSize(new Dimension(25,25));
+		buttonPanel.setBackground(Theme.FOOTER_BACKGROUND);
+		openSsh = new JButton("SSH");
+		buttonPanel.add(openSsh);
 		
+		openLocal = new JButton("Open");
+		buttonPanel.add(openLocal);
+		
+		
+		this.add(buttonPanel, BorderLayout.NORTH);
+		
+		// Create a scroll area where open logs will be listed
 		JScrollPane scroller = new JScrollPane(menuItems);
 		scroller.getVerticalScrollBar().setUI(new SimpleScroller());
 		scroller.getHorizontalScrollBar().setUI(new SimpleScroller());
@@ -53,6 +72,8 @@ public class ShadowsMenu extends JPanel{
 		scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		
+		
+		// Create filter box for filtering out open logs
 		this.add(scroller, BorderLayout.CENTER);
 		filterBox = new FilterBox();
 		filterBox.addFilterBoxListener(new FilterBoxListener() {
@@ -74,6 +95,19 @@ public class ShadowsMenu extends JPanel{
 		loadResources();
 	}
 	
+	public void setOpenAction(ActionListener listener){
+		for(ActionListener l : openLocal.getActionListeners()){
+			openLocal.removeActionListener(l);
+		}
+		openLocal.addActionListener(listener);
+	}
+	
+	public void setOpenSshAction(ActionListener listener){
+		for(ActionListener l : openLocal.getActionListeners()){
+			openSsh.removeActionListener(l);
+		}
+		openSsh.addActionListener(listener);
+	}
 	
 	private void loadResources() {
 		try {
