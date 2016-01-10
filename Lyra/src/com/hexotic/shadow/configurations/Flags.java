@@ -21,7 +21,8 @@ public class Flags {
 	
 	public Map<String, String> getLogFlags(String logId) {
 		Map<String, String> flags = new TreeMap<String, String>();
-		
+		flags.put(COUNTER_WARNING, "WARNING");
+		flags.put(COUNTER_ERROR, "ERROR");
 		return flags;
 	}
 	

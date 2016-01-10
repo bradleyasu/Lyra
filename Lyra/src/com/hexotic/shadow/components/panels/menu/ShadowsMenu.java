@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 
 import com.hexotic.lib.exceptions.ResourceException;
 import com.hexotic.lib.resource.Resources;
+import com.hexotic.lib.ui.buttons.SoftButton;
 import com.hexotic.lib.ui.panels.SimpleScroller;
 import com.hexotic.shadow.components.panels.footer.FilterBox;
 import com.hexotic.shadow.components.panels.footer.FilterBoxListener;
@@ -36,24 +37,35 @@ public class ShadowsMenu extends JPanel{
 	private FilterBox filterBox;
 	private Image notFoundIcon;
 	private Font font;
-	private JButton openLocal;
-	private JButton openSsh;
+	private SoftButton openLocal;
+	private SoftButton openSsh;
 	
 	public ShadowsMenu(){
 		this.setBackground(Theme.FOOTER_BACKGROUND_DARKER);
 		this.setLayout(new BorderLayout());
 		listeners = new ArrayList<MenuListener>();
+		loadResources();
 		
 		menuItems = new ShadowLogs();
 
 		// Create a button panel for opening logs
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		buttonPanel.setPreferredSize(new Dimension(25,25));
+		buttonPanel.setPreferredSize(new Dimension(35,35));
 		buttonPanel.setBackground(Theme.FOOTER_BACKGROUND);
-		openSsh = new JButton("SSH");
+		openSsh = new SoftButton("Open SSH");
+		openSsh.setBackgroundColor(Theme.FOOTER_BACKGROUND);
+		openSsh.setPreferredSize(new Dimension(70,22));
+		openSsh.setForegroundColor(Theme.FOOTER_FONT_COLOR);
+		openSsh.setArc(2);
+		openSsh.setFont(font);
 		buttonPanel.add(openSsh);
 		
-		openLocal = new JButton("Open");
+		openLocal = new SoftButton("Open");
+		openLocal.setBackgroundColor(Theme.FOOTER_BACKGROUND);
+		openLocal.setPreferredSize(new Dimension(70,22));
+		openLocal.setForegroundColor(Theme.FOOTER_FONT_COLOR);
+		openLocal.setArc(2);
+		openLocal.setFont(font);
 		buttonPanel.add(openLocal);
 		
 		
@@ -91,8 +103,6 @@ public class ShadowsMenu extends JPanel{
 			}
 		});
 		this.add(filterBox, BorderLayout.SOUTH);
-		
-		loadResources();
 	}
 	
 	public void setOpenAction(ActionListener listener){

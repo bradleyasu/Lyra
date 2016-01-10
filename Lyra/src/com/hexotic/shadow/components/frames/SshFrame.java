@@ -111,7 +111,7 @@ public class SshFrame extends JInternalFrame{
 			
 			
 			sshIp = new ModernTextField("", "Remote IP address");
-			sshIp.setPreferredSize(new Dimension(350, 30));
+			sshIp.setPreferredSize(new Dimension(348, 30));
 			sshIp.setFont(font);
 			sshIp.setSelectionColor(Theme.LINE_SELECT_COLOR);
 			sshIp.addKeyListener(new KeyListener(){

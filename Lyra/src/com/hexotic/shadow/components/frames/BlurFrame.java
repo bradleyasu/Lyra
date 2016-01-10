@@ -1,6 +1,7 @@
 package com.hexotic.shadow.components.frames;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -83,6 +84,9 @@ public class BlurFrame extends JInternalFrame{
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	
 			g2d.drawImage(background, -1, -1, getWidth()+2, getHeight()+2, null);
+			
+			g2d.setColor(new Color(10,10,10,100));
+			g2d.fillRect(0, 0, getWidth(), getHeight());
 		}
 	}
 }
