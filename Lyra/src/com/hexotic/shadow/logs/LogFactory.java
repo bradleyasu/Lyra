@@ -24,6 +24,8 @@ public class LogFactory {
 			} else {
 				if(logLocation.getName().endsWith(".sshadow")){
 					log = generateSshLog(id, logLocation);
+				} else if(logLocation.getName().endsWith(".htshadow")) {
+					log = new HttpLog(id, logLocation);
 				} else {
 					log = new LocalLog(id, logLocation);
 				}

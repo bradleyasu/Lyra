@@ -50,7 +50,7 @@ public class SshLog implements Log {
 		listeners = new ArrayList<LogListener>();
 		
 		// Add test flags
-		Map<String, String> flags = Flags.getInstance().getLogFlags(logId);
+		flags = Flags.getInstance().getLogFlags(logId);
 		for(String flag : flags.keySet()){
 			addFlag(flag, flags.get(flag));
 		}
