@@ -15,11 +15,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.hexotic.lib.ui.input.textfield.ModernTextField;
+import com.hexotic.lib.util.StringOps;
 import com.hexotic.shadow.constants.Theme;
 
 public class LogLine extends JPanel{
@@ -36,6 +40,7 @@ public class LogLine extends JPanel{
 	private List<LineListener> listeners;
 	
 	private String flag = "";
+	private String filter = "";
 	
 	public LogLine(int lneNumber, String flag, String line) {
 		this.lineNumber = lneNumber;
@@ -174,6 +179,10 @@ public class LogLine extends JPanel{
 		lineColor = color;
 	}
 	
+	public void setFilter(String filter){
+		this.filter = filter.substring(4,filter.length()-4);
+	}
+	
 	@Override
 	public void paintComponent(Graphics g){ 
 		super.paintComponent(g);
@@ -224,10 +233,53 @@ public class LogLine extends JPanel{
 		
 		g2d.drawLine(Theme.LINE_NUMBER_WIDTH, 0, Theme.LINE_NUMBER_WIDTH, getHeight());
 		
+		
+		// Draw Highlighting
+		if(filter.length() > 2) {
+			g2d.setColor(Theme.LINE_SELECT_COLOR);
+			try{
+				String[] split = splitWithDelimiters(line, filter);
+				int wd = 0;
+				for(String s : split){
+					double twd = StringOps.getStringBounds(g2d, font, s).getWidth();
+					if(s.matches(filter)){
+						g2d.fillRect(Theme.LINE_NUMBER_WIDTH+wd+2, 0, (int) twd, getHeight());
+						wd = wd -4;
+					}
+					wd += twd;
+				}
+			} catch (PatternSyntaxException e) { /* Do nothing */ }
+		}
+		
 		// Draw log line
 		g2d.setColor(Theme.LINE_FOREGROUND);
 		
 		g2d.drawString(line, Theme.LINE_NUMBER_WIDTH + 4 ,fht);
-		
 	}
+	
+	private String[] splitWithDelimiters(String str, String regex) throws PatternSyntaxException {
+		List<String> parts = new ArrayList<String>();
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(str);
+		int lastEnd = 0;
+		while(m.find()) {
+			int start = m.start();
+		    if(lastEnd != start) {
+		    	String nonDelim = str.substring(lastEnd, start);
+		        parts.add(nonDelim);
+		    }
+		    String delim = m.group();
+		    parts.add(delim);
+		 
+		    int end = m.end();
+		    lastEnd = end;
+		}
+		if(lastEnd != str.length()) {
+			String nonDelim = str.substring(lastEnd);
+		    parts.add(nonDelim);
+		}
+		String[] res =  parts.toArray(new String[]{});
+		return res;
+	}
+	
 }

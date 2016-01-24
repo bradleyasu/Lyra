@@ -10,8 +10,11 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -51,6 +54,8 @@ public class LogPanel extends JPanel{
 	
 	private String activeLogId = "";
 	
+	private Image img;
+	
 	public LogPanel() {
 		panel = this;
 		listeners = new ArrayList<LogPanelListener>();
@@ -58,9 +63,16 @@ public class LogPanel extends JPanel{
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		lines = new TreeMap<Integer, LogLine>();
 		
+		try {
+			img = Resources.getInstance().getImage("default.png");
+		} catch (ResourceException e) {
+			e.printStackTrace();
+		}
+		
 		bindHotkeys();
 		this.setFocusable(true);
 		obtainFocus();
+		
 	}
 	
 	public void addLogPanelListener(LogPanelListener listener){
@@ -143,21 +155,38 @@ public class LogPanel extends JPanel{
 	}
 	
 	public void filter(String text) {
-		filter = text;
+		filter = "(.*)("+text+")(.*)";
 		
 //		if(filter.startsWith("/")){
 //			text = text.substring(1,text.length());
 //			System.out.println(text);
 //		} else {
-		for(LogLine line : lines.values()){
-			if(line.getText().contains(text)){ 
-				line.setVisible(true);
-			} else {
-				line.setVisible(false);
-			}
+		
+		boolean isRegex;
+		try {
+		  Pattern.compile(filter);
+		  isRegex = true;
+		} catch (PatternSyntaxException e) {
+		  isRegex = false;
 		}
-//		}
+		try{
+			for(LogLine line : lines.values()){
+				line.setFilter(filter);
+				if(line.getText().contains(filter)){
+					line.setVisible(true);
+				} else if(isRegex && line.getText().matches(filter)) {
+					line.setVisible(true);
+				} else {
+					line.setVisible(false);
+				}
+				line.refresh();
+			}
+		} catch (ConcurrentModificationException e){
+			/* this will happen sometimes and it's okay.  Just continue and things will be okay */
+		}
 	}
+
+	
 	
 	public Log getLog() {
 		return log;
@@ -286,7 +315,9 @@ public class LogPanel extends JPanel{
 	
 	public void addLine(String line, String flag) {
 		LogLine logLine = new LogLine(lineCount, flag, line);
+		
 		lines.put(lineCount, logLine);
+			
 		
 		switch(flag){
 		case Flags.COUNTER_ERROR:
@@ -303,9 +334,17 @@ public class LogPanel extends JPanel{
 			break;
 		}
 		
-		if(!filter.isEmpty() && !logLine.getText().contains(filter)){
-			logLine.setVisible(false);
+		if(!filter.isEmpty()){
+			logLine.setFilter(filter);
+			if(logLine.getText().contains(filter)){
+				logLine.setVisible(true);
+			} else if(logLine.getText().matches(filter)) {
+				logLine.setVisible(true);
+			} else {
+				logLine.setVisible(false);
+			}
 		}
+		
 		this.add(logLine);
 		
 		if(lines.size() > Constants.LOG_MAX+1 && pauseState == NO_PAUSE){
@@ -399,13 +438,8 @@ public class LogPanel extends JPanel{
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
-		if(lines.isEmpty()){
-			try {
-				Image img = Resources.getInstance().getImage("Default.png");
-				g2d.drawImage(img, getWidth()/2-img.getWidth(null)/2, getHeight()/2-img.getHeight(null)/2, null);
-			} catch (ResourceException e) {
-				e.printStackTrace();
-			}
+		if(lines.isEmpty() && img != null){
+			g2d.drawImage(img, getWidth()/2-img.getWidth(null)/2, getHeight()/2-img.getHeight(null)/2, null);
 		}
 		
 	}

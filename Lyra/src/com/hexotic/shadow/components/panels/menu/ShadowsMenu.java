@@ -121,7 +121,7 @@ public class ShadowsMenu extends JPanel{
 	
 	private void loadResources() {
 		try {
-			notFoundIcon = Resources.getInstance().getImage("fileTypes/question.png");
+			notFoundIcon = Resources.getInstance().getImage("filetypes/question.png");
 		} catch (ResourceException e) {
 			e.printStackTrace();
 		}
