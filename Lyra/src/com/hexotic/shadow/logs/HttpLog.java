@@ -42,10 +42,7 @@ public class HttpLog implements Log{
 		this.listeners = new ArrayList<LogListener>();
 		
 		
-		flags = Flags.getInstance().getLogFlags(logId);
-		for(String flag : flags.keySet()){
-			addFlag(flag, flags.get(flag));
-		}
+		refreshFlags();
 		
 		try {
 			downloadCache = new File("C:\\Users\\Bradley\\AppData\\Roaming\\Shadow\\connections\\download.dlog");
@@ -55,6 +52,14 @@ public class HttpLog implements Log{
 			url = new URL("http://192.168.1.211");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public void refreshFlags() {
+		this.flags.clear();
+		Map<String, String> flags = Flags.getInstance().getLogFlags(logId);
+		for(String flag : flags.keySet()){
+			addFlag(flag, flags.get(flag));
 		}
 	}
 
@@ -224,5 +229,9 @@ public class HttpLog implements Log{
 	@Override
 	public File getFile() {
 		return configFile;
+	}
+	
+	public Map<String, String> getFlags() {
+		return flags;
 	}
 }

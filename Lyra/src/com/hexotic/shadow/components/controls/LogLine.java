@@ -24,6 +24,7 @@ import javax.swing.JPanel;
 
 import com.hexotic.lib.ui.input.textfield.ModernTextField;
 import com.hexotic.lib.util.StringOps;
+import com.hexotic.shadow.configurations.Flags;
 import com.hexotic.shadow.constants.Theme;
 
 public class LogLine extends JPanel{
@@ -88,6 +89,26 @@ public class LogLine extends JPanel{
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		
 
+	}
+	
+	public void setFlag(String flag){
+		this.flag = flag;
+		switch(flag){
+		case Flags.COUNTER_ERROR:
+			setLineColor(Theme.ERROR_COLOR);
+			break;
+		case Flags.COUNTER_WARNING:
+			setLineColor(Theme.WARNING_COLOR);
+			break;
+		case Flags.COUNTER_SUCCESS:
+			setLineColor(Theme.SUCCESS_COLOR);
+			break;
+		case Flags.COUNTER_INFO:
+			setLineColor(Theme.INFO_COLOR);
+			break;
+		default:
+			setLineColor(Theme.LINE_BACKGROUND);
+		}
 	}
 	
 	public String getFlag() {
@@ -182,7 +203,7 @@ public class LogLine extends JPanel{
 	public void setFilter(String filter){
 		this.filter = filter.substring(4,filter.length()-4);
 	}
-	
+		
 	@Override
 	public void paintComponent(Graphics g){ 
 		super.paintComponent(g);

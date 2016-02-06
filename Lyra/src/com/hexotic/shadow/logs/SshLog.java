@@ -50,13 +50,18 @@ public class SshLog implements Log {
 		listeners = new ArrayList<LogListener>();
 		
 		// Add test flags
-		flags = Flags.getInstance().getLogFlags(logId);
-		for(String flag : flags.keySet()){
-			addFlag(flag, flags.get(flag));
-		}
+		refreshFlags();
 		
 		sshConfig = new SshProperties(configFile);
 		sshConfig.readPropertiesFile();
+	}
+	
+	public void refreshFlags() {
+		this.flags.clear();
+		Map<String, String> flags = Flags.getInstance().getLogFlags(logId);
+		for(String flag : flags.keySet()){
+			addFlag(flag, flags.get(flag));
+		}
 	}
 	
 	public void startShadow() {
@@ -227,5 +232,9 @@ public class SshLog implements Log {
 				// This is okay, the thread will be interrupted when closing
 			}
 		}
+	}
+	
+	public Map<String, String> getFlags() {
+		return flags;
 	}
 }

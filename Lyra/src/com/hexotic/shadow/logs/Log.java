@@ -1,6 +1,7 @@
 package com.hexotic.shadow.logs;
 
 import java.io.File;
+import java.util.Map;
 
 public interface Log {
 
@@ -77,4 +78,24 @@ public interface Log {
 	 * @return Local log file on disk
 	 */
 	public File getFile();
+	
+	/**
+	 * This method will re-read the flag properties to update what lines are to be flaged with 
+	 * what color
+	 * 
+	 */
+	public void refreshFlags();
+	
+	/**
+	 * Get list of flags for the log
+	 * 
+	 * @return Map of Flag name and definitions
+	 */
+	public Map<String, String> getFlags();
+	
+	/**
+	 * Checks a line to see if it contains any of the flags
+	 * @return the flag of the line
+	 */
+	public String checkFlags(String line);
 }

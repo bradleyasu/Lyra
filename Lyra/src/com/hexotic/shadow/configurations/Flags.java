@@ -1,11 +1,12 @@
 package com.hexotic.shadow.configurations;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -25,9 +26,16 @@ public class Flags {
 	
 	private Properties properties;
 	
+	private List<FlagListener> listeners;
+	
 	private Flags() {
 		properties = new Properties();
+		listeners = new ArrayList<FlagListener>();
 		loadProperties();
+	}
+	
+	public void addFlagListner(FlagListener listener){
+		listeners.add(listener);
 	}
 	
 	private synchronized void loadProperties(){
@@ -58,7 +66,9 @@ public class Flags {
 	
 	public synchronized void setFlag(String logId, String flagType, String flagRegEx) {
 		properties.setProperty(logId+"."+flagType, flagRegEx);
-		
+		for(FlagListener listener : listeners){
+			listener.flagsUpdated(logId);
+		}
 	}
 	
 	public synchronized void storeProperties() {

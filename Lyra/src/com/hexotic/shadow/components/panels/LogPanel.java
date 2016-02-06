@@ -25,6 +25,7 @@ import com.hexotic.lib.resource.Resources;
 import com.hexotic.shadow.components.controls.LineEvent;
 import com.hexotic.shadow.components.controls.LineListener;
 import com.hexotic.shadow.components.controls.LogLine;
+import com.hexotic.shadow.configurations.FlagListener;
 import com.hexotic.shadow.configurations.Flags;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
@@ -84,6 +85,20 @@ public class LogPanel extends JPanel{
 		bindHotkeys();
 		this.setFocusable(true);
 		obtainFocus();
+		
+		Flags.getInstance().addFlagListner(new FlagListener(){
+			@Override
+			public void flagsUpdated(String logId) {
+				if(activeLogId.equals(logId)){
+					log.refreshFlags();
+					for(LogLine line : lines.values()){
+						line.setFlag(log.checkFlags(line.getText()));
+						line.refresh();
+						
+					}
+				}
+			}
+		});
 		
 	}
 	
@@ -202,7 +217,7 @@ public class LogPanel extends JPanel{
 			/* this will happen sometimes and it's okay.  Just continue and things will be okay */
 		}
 	}
-	
+
 	public void setFlagFilter(String flagFilter){
 		if(this.flagFilter.equals(flagFilter)){
 			this.flagFilter = "";
@@ -341,22 +356,7 @@ public class LogPanel extends JPanel{
 		
 		lines.put(lineCount, logLine);
 			
-		
-		switch(flag){
-		case Flags.COUNTER_ERROR:
-			logLine.setLineColor(Theme.ERROR_COLOR);
-			break;
-		case Flags.COUNTER_WARNING:
-			logLine.setLineColor(Theme.WARNING_COLOR);
-			break;
-		case Flags.COUNTER_SUCCESS:
-			logLine.setLineColor(Theme.SUCCESS_COLOR);
-			break;
-		case Flags.COUNTER_INFO:
-			logLine.setLineColor(Theme.INFO_COLOR);
-			break;
-		}
-		
+		logLine.setFlag(flag);
 		
 		boolean isRegex;
 		try {

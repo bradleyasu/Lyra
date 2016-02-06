@@ -21,8 +21,6 @@ public class LocalLog implements Log{
 	// Alarm flags - Key is type of flag and value is the text required to trigger flag in line
 	private Map<String, String> flags;
 	
-	// Total count of different types of flags - Key is the type of flag and value is the total number of them
-	private Map<String, Integer> flagCounts;
 	private String logId;
 	
 	private boolean started = false;
@@ -33,14 +31,18 @@ public class LocalLog implements Log{
 		this.logId = id;
 		listeners = new ArrayList<LogListener>();
 		flags = new HashMap<String, String>();
-		flagCounts = new HashMap<String, Integer>();
 		
 		// Add test flags
-		Map<String, String> flags = Flags.getInstance().getLogFlags(id);
+		refreshFlags();
+
+	}
+	
+	public void refreshFlags() {
+		this.flags.clear();
+		Map<String, String> flags = Flags.getInstance().getLogFlags(logId);
 		for(String flag : flags.keySet()){
 			addFlag(flag, flags.get(flag));
 		}
-
 	}
 	
 	public File getFile() {
@@ -154,5 +156,9 @@ public class LocalLog implements Log{
 			close();
 			startShadow();
 		}
+	}
+	
+	public Map<String, String> getFlags() {
+		return flags;
 	}
 }

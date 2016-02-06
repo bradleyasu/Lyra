@@ -72,9 +72,14 @@ public class FooterBar extends JPanel{
 			counter.addFooterCounterListener(new FooterCounterListener(){
 				@Override
 				public void counterActivated(int click, FooterCounter source) {
-					if(click == FooterCounter.RIGHT_CLICK){
-						flagConfig.setFlagToConfigure(selectedLogId, source.getFlagType());
-						flagConfig.setVisible(true);
+					// Don't trigger the properties for bookmark as these can't be configured
+					if(!source.getFlagType().equals(Flags.COUNTER_BOOKMARK)){
+						
+						if(click == FooterCounter.RIGHT_CLICK){
+							flagConfig.setFlagToConfigure(selectedLogId, source.getFlagType());
+							flagConfig.setVisible(true);
+						}
+						
 					}
 				}
 			});

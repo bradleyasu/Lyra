@@ -49,7 +49,7 @@ public class FlagConfigurationFrame extends JInternalFrame{
 	public void setFlagToConfigure(String logId, String flag) {
 		this.selectedLogId = logId;
 		this.flagType = flag;
-		configRegex.setText(Flags.getInstance().getLogFlags(logId).get(flag));
+		configRegex.setText(Flags.getInstance().getLogFlags(logId).get(flag).substring(4, Flags.getInstance().getLogFlags(logId).get(flag).length()-4));
 		checkInput();
 		switch(flag){
 		case Flags.COUNTER_SUCCESS:
@@ -76,10 +76,12 @@ public class FlagConfigurationFrame extends JInternalFrame{
 			@Override
 			public void keyReleased(KeyEvent arg0) {
 				checkInput();
-				if(arg0.getKeyCode() == KeyEvent.VK_ENTER){
+				if(arg0.getKeyCode() == KeyEvent.VK_ENTER || arg0.getKeyCode() == KeyEvent.VK_ESCAPE){
 					innerPanel.requestFocus();
 				} else {
-					Flags.getInstance().setFlag(selectedLogId, flagType, configRegex.getText());
+					if(checkInput()){
+						Flags.getInstance().setFlag(selectedLogId, flagType, "(.*)"+configRegex.getText()+"(.*)");
+					}
 				}
 			}
 			@Override
@@ -90,7 +92,7 @@ public class FlagConfigurationFrame extends JInternalFrame{
 		repaint();
 	}
 	
-	private void checkInput() {
+	private boolean checkInput() {
 		boolean isRegex;
 		try {
 		  Pattern.compile(configRegex.getText());
@@ -99,6 +101,7 @@ public class FlagConfigurationFrame extends JInternalFrame{
 		  isRegex = false;
 		}
 		configRegex.setAccepted(isRegex);
+		return isRegex;
 	}
 	
 	private FlagConfigurationFrame getThis() {
@@ -127,7 +130,9 @@ public class FlagConfigurationFrame extends JInternalFrame{
 				@Override
 				public void focusLost(FocusEvent arg0) {
 					getThis().setVisible(false);
-					Flags.getInstance().storeProperties();
+					if(checkInput()){
+						Flags.getInstance().storeProperties();
+					}
 				}
 			});
 		}

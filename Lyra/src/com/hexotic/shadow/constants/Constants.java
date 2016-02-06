@@ -26,7 +26,7 @@ public class Constants {
 
 	/* Flag Configuration Window Attributes */
 	public static final int FLAG_CONFIG_WIDTH = 400;
-	public static final int FLAG_CONFIG_HEIGHT = 80;
+	public static final int FLAG_CONFIG_HEIGHT = 70;
 	
 	/* Footer attributes */
 	public static final int FOOTER_SIZE = 20;
