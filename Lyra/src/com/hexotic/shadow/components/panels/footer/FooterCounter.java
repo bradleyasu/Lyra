@@ -10,21 +10,31 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
 
 public class FooterCounter extends JPanel{
 
+	public static final int LEFT_CLICK = 0;
+	public static final int RIGHT_CLICK = 1;
+	
 	private Color color;
 	private int count;
 	private boolean hovering = false;
+	private List<FooterCounterListener> listeners;
+	private String flagType;
 	
-	public FooterCounter(Color color, int startCount){ 
+	public FooterCounter(Color color, int startCount, String flagType){ 
 		this.count = startCount;
 		this.color = color;
+		this.listeners = new ArrayList<FooterCounterListener>();
+		this.flagType = flagType;
 		this.setPreferredSize(new Dimension(Constants.FOOTER_COUNTER_WIDTH, Constants.FOOTER_SIZE));
 		this.addMouseListener(new MouseListener(){
 			@Override
@@ -44,12 +54,31 @@ public class FooterCounter extends JPanel{
 			public void mousePressed(MouseEvent arg0) {
 			}
 			@Override
-			public void mouseReleased(MouseEvent arg0) {
+			public void mouseReleased(MouseEvent click) {
+				int cType = RIGHT_CLICK;
+				if(SwingUtilities.isLeftMouseButton(click)){
+					cType = LEFT_CLICK;
+				}
+				for(FooterCounterListener listener : listeners) {
+					listener.counterActivated(cType, getThis());
+				}
 			}
 		});
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 	}
 
+	public String getFlagType() {
+		return flagType;
+	}
+	
+	public void addFooterCounterListener(FooterCounterListener listener){
+		listeners.add(listener);
+	}
+	
+	private FooterCounter getThis() {
+		return this;
+	}
+	
 	public int getCount() {
 		return count;
 	}

@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 
 import com.hexotic.lib.exceptions.ResourceException;
 import com.hexotic.lib.resource.Resources;
+import com.hexotic.shadow.components.frames.FlagConfigurationFrame;
 import com.hexotic.shadow.configurations.Flags;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
@@ -26,6 +27,11 @@ public class FooterBar extends JPanel{
 	
 	// Line counters - Key being the counter name and value being the counter control
 	private Map<String, FooterCounter> counters;
+	
+	
+	private FlagConfigurationFrame flagConfig;
+	
+	private String selectedLogId = "";
 	
 	public FooterBar() {
 		this.setPreferredSize(new Dimension(Constants.FOOTER_SIZE, Constants.FOOTER_SIZE));
@@ -55,14 +61,23 @@ public class FooterBar extends JPanel{
 	private void setupCounters() {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0,0));
 		panel.setBackground(Theme.FOOTER_BACKGROUND);
-		counters.put(Flags.COUNTER_SUCCESS, new FooterCounter(Theme.SUCCESS_COLOR, 0));
-		counters.put(Flags.COUNTER_INFO, new FooterCounter(Theme.INFO_COLOR, 0));
-		counters.put(Flags.COUNTER_WARNING, new FooterCounter(Theme.WARNING_COLOR, 0));
-		counters.put(Flags.COUNTER_ERROR, new FooterCounter(Theme.ERROR_COLOR, 0));
-		counters.put(Flags.COUNTER_BOOKMARK, new FooterCounter(Theme.LINE_BOOKMARK_COLOR, 0));
+		counters.put(Flags.COUNTER_SUCCESS, new FooterCounter(Theme.SUCCESS_COLOR, 0, Flags.COUNTER_SUCCESS));
+		counters.put(Flags.COUNTER_INFO, new FooterCounter(Theme.INFO_COLOR, 0, Flags.COUNTER_INFO));
+		counters.put(Flags.COUNTER_WARNING, new FooterCounter(Theme.WARNING_COLOR, 0, Flags.COUNTER_WARNING));
+		counters.put(Flags.COUNTER_ERROR, new FooterCounter(Theme.ERROR_COLOR, 0, Flags.COUNTER_ERROR));
+		counters.put(Flags.COUNTER_BOOKMARK, new FooterCounter(Theme.LINE_BOOKMARK_COLOR, 0, Flags.COUNTER_BOOKMARK));
 		
 		for(FooterCounter counter : counters.values()){
 			panel.add(counter);
+			counter.addFooterCounterListener(new FooterCounterListener(){
+				@Override
+				public void counterActivated(int click, FooterCounter source) {
+					if(click == FooterCounter.RIGHT_CLICK){
+						flagConfig.setFlagToConfigure(selectedLogId, source.getFlagType());
+						flagConfig.setVisible(true);
+					}
+				}
+			});
 		}
 		
 		this.add(panel, BorderLayout.CENTER);
@@ -80,6 +95,14 @@ public class FooterBar extends JPanel{
 	
 	public FooterMenuItem getPrimaryMenuItem() {
 		return primaryMenuItem;
+	}
+	
+	public void setFlagConfigFrame(FlagConfigurationFrame configFrame){
+		flagConfig = configFrame;
+	}
+	
+	public void setSelectedLog(String logId){
+		this.selectedLogId = logId;
 	}
 	
 	@Override

@@ -19,6 +19,8 @@ import com.hexotic.shadow.components.panels.LogPanelEvent;
 import com.hexotic.shadow.components.panels.LogPanelListener;
 import com.hexotic.shadow.components.panels.footer.FilterBoxListener;
 import com.hexotic.shadow.components.panels.footer.FooterBar;
+import com.hexotic.shadow.components.panels.footer.FooterCounter;
+import com.hexotic.shadow.components.panels.footer.FooterCounterListener;
 import com.hexotic.shadow.components.panels.footer.FooterMenuItemListener;
 import com.hexotic.shadow.configurations.Flags;
 import com.hexotic.shadow.constants.Constants;
@@ -55,10 +57,17 @@ public class ShadowFrame extends JInternalFrame{
 		scroller.getVerticalScrollBar().setUnitIncrement(25);
 		Dimension scrollSize = new Dimension(15,15);
 		scroller.getVerticalScrollBar().setPreferredSize(scrollSize);
-		scroller.getHorizontalScrollBar().setPreferredSize(scrollSize);
+		scroller.getHorizontalScrollBar().setPreferredSize(new Dimension(5,5));
+		scroller.getHorizontalScrollBar().setBackground(Theme.LINE_BACKGROUND);
+		scroller.getHorizontalScrollBar().setUnitIncrement(25);
 		scroller.setBackground(Theme.MAIN_BACKGROUND);
 		scroller.setMinimumSize(logPanel.getPreferredSize());
-		scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		if(Constants.SHOW_HORIZONTAL_SCROLL){
+			scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		} else {
+			scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		}
+		
 		
 		scroller.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {  
 			private boolean lock = false;
@@ -101,6 +110,18 @@ public class ShadowFrame extends JInternalFrame{
 				}
 			}
 		});
+		
+		for(FooterCounter counter : footer.getCounters().values()){
+			counter.addFooterCounterListener(new FooterCounterListener(){
+				@Override
+				public void counterActivated(int click, FooterCounter source) {
+					if(click == FooterCounter.LEFT_CLICK){
+						logPanel.setFlagFilter(source.getFlagType());
+						logPanel.filter(footer.getFilterBox().getField().getText());
+					}
+				}
+			});
+		}
 		
 		
 		logPanel.addLogPanelListener(new LogPanelListener() {
@@ -164,6 +185,8 @@ public class ShadowFrame extends JInternalFrame{
 		logPanel.setLog(log);
 		// Start the shadow process
 		logPanel.getLog().startShadow();
+		
+		footer.setSelectedLog(log.getLogId());
 	}
 	
 	public void openLog(File logFile) {
@@ -180,6 +203,10 @@ public class ShadowFrame extends JInternalFrame{
 		});
 		
 		this.menu.setShadowButton(footer.getPrimaryMenuItem());
+	}
+	
+	public void setFlagConfigFrame(FlagConfigurationFrame configFrame){
+		footer.setFlagConfigFrame(configFrame);
 	}
 	
 }

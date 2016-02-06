@@ -236,7 +236,7 @@ public class LogLine extends JPanel{
 		
 		// Draw Highlighting
 		if(filter.length() > 2) {
-			g2d.setColor(Theme.LINE_SELECT_COLOR);
+			g2d.setColor(Theme.LINE_FILTER_COLOR);
 			try{
 				String[] split = splitWithDelimiters(line, filter);
 				int wd = 0;

@@ -48,13 +48,23 @@ public class LogPanel extends JPanel{
 	private int mouseDownLine = -1;
 	private int mouseUpLine = -1;
 	
+	// Keep track of how many lines are hidden because they are filtered out
+	private int filteredOutCount = 0;
+	private String flagFilter = "";
+	
 	private int pauseState = NO_PAUSE;
 	
 	private List<LogPanelListener> listeners;
 	
 	private String activeLogId = "";
 	
-	private Image img;
+	private Image welcome;
+	private Image preparing;
+	private Image fail;
+	
+	private boolean open = false;
+	private boolean failed = false;
+	
 	
 	public LogPanel() {
 		panel = this;
@@ -64,7 +74,9 @@ public class LogPanel extends JPanel{
 		lines = new TreeMap<Integer, LogLine>();
 		
 		try {
-			img = Resources.getInstance().getImage("default.png");
+			welcome = Resources.getInstance().getImage("default.png");
+			preparing = Resources.getInstance().getImage("preparing.png");
+			fail = Resources.getInstance().getImage("open_fail.png");
 		} catch (ResourceException e) {
 			e.printStackTrace();
 		}
@@ -126,13 +138,16 @@ public class LogPanel extends JPanel{
 				@Override
 				public void logClosed(String logId) {
 					// TODO Auto-generated method stub
-					
+					open = false;
+					refresh();
 				}
 
 				@Override
 				public void logOpened(String logId) {
 					// TODO Auto-generated method stub
-					
+					open = true;
+					failed = false;
+					refresh();
 				}
 
 				@Override
@@ -142,8 +157,8 @@ public class LogPanel extends JPanel{
 
 				@Override
 				public void logNotFound(String logId) {
-					// TODO Auto-generated method stub
-					
+					failed = true;
+					refresh();
 				}
 
 				@Override
@@ -169,15 +184,17 @@ public class LogPanel extends JPanel{
 		} catch (PatternSyntaxException e) {
 		  isRegex = false;
 		}
+		filteredOutCount = 0;
 		try{
 			for(LogLine line : lines.values()){
 				line.setFilter(filter);
-				if(line.getText().contains(filter)){
+				if(line.getText().contains(filter) && (line.getFlag().contains(flagFilter) || (flagFilter.equals(Flags.COUNTER_BOOKMARK) && line.isBookmarked()))){
 					line.setVisible(true);
-				} else if(isRegex && line.getText().matches(filter)) {
+				} else if(isRegex && line.getText().matches(filter) && line.getFlag().contains(flagFilter) || (flagFilter.equals(Flags.COUNTER_BOOKMARK) && line.isBookmarked())) {
 					line.setVisible(true);
 				} else {
 					line.setVisible(false);
+					filteredOutCount++;
 				}
 				line.refresh();
 			}
@@ -185,9 +202,15 @@ public class LogPanel extends JPanel{
 			/* this will happen sometimes and it's okay.  Just continue and things will be okay */
 		}
 	}
+	
+	public void setFlagFilter(String flagFilter){
+		if(this.flagFilter.equals(flagFilter)){
+			this.flagFilter = "";
+		} else {
+			this.flagFilter = flagFilter;
+		}
+	}
 
-	
-	
 	public Log getLog() {
 		return log;
 	}
@@ -334,14 +357,24 @@ public class LogPanel extends JPanel{
 			break;
 		}
 		
+		
+		boolean isRegex;
+		try {
+		  Pattern.compile(filter);
+		  isRegex = true;
+		} catch (PatternSyntaxException e) {
+		  isRegex = false;
+		}
+		
 		if(!filter.isEmpty()){
 			logLine.setFilter(filter);
-			if(logLine.getText().contains(filter)){
+			if(logLine.getText().contains(filter) && (logLine.getFlag().contains(flagFilter) || (flagFilter.equals(Flags.COUNTER_BOOKMARK) && logLine.isBookmarked()))){
 				logLine.setVisible(true);
-			} else if(logLine.getText().matches(filter)) {
+			} else if(isRegex && logLine.getText().matches(filter) && logLine.getFlag().contains(flagFilter) || (flagFilter.equals(Flags.COUNTER_BOOKMARK) && logLine.isBookmarked())) {
 				logLine.setVisible(true);
 			} else {
 				logLine.setVisible(false);
+				filteredOutCount++;
 			}
 		}
 		
@@ -438,8 +471,14 @@ public class LogPanel extends JPanel{
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
-		if(lines.isEmpty() && img != null){
-			g2d.drawImage(img, getWidth()/2-img.getWidth(null)/2, getHeight()/2-img.getHeight(null)/2, null);
+		if(lines.isEmpty() && welcome != null && !open && !failed){
+			g2d.drawImage(welcome, getWidth()/2-welcome.getWidth(null)/2, getHeight()/2-welcome.getHeight(null)/2, null);
+		} else if(lines.isEmpty() && open && !failed){
+			g2d.drawImage(preparing, getWidth()/2-welcome.getWidth(null)/2, getHeight()/2-welcome.getHeight(null)/2, null);
+		} else if(failed){
+			g2d.drawImage(fail, getWidth()/2-welcome.getWidth(null)/2, getHeight()/2-welcome.getHeight(null)/2, null);
+		} else if(lines.size() == filteredOutCount) {
+			// TODO show no results message?
 		}
 		
 	}

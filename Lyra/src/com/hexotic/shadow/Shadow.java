@@ -32,6 +32,7 @@ import com.hexotic.shadow.components.frames.BlurFrame;
 import com.hexotic.shadow.components.frames.DialogEvent;
 import com.hexotic.shadow.components.frames.DialogListener;
 import com.hexotic.shadow.components.frames.DropFrame;
+import com.hexotic.shadow.components.frames.FlagConfigurationFrame;
 import com.hexotic.shadow.components.frames.MenuFrame;
 import com.hexotic.shadow.components.frames.ShadowFrame;
 import com.hexotic.shadow.components.frames.SshFrame;
@@ -44,6 +45,7 @@ public class Shadow extends JFrame{
 	private DropFrame dropFrame;
 	private BlurFrame blurFrame;
 	private SshFrame sshFrame;
+	private FlagConfigurationFrame flagConfigFrame;
 	
 	private MenuFrame menuFrame;
 	
@@ -65,6 +67,9 @@ public class Shadow extends JFrame{
 		
 		/* Build Dialog for Creating SSH Connections */
 		sshFrame = new SshFrame();
+		
+		/* Flag Configuration Frame for setting flags */
+		flagConfigFrame = new FlagConfigurationFrame();
 		
 		/* Build a "Blur Panel" that will be displayed when prompt boxes are open */
 		blurFrame = new BlurFrame();
@@ -106,6 +111,7 @@ public class Shadow extends JFrame{
 		// anything that is a prompt should be displayed at 35 or higher
 		rootPane.add(blurFrame, new Integer(30));
 		rootPane.add(sshFrame, new Integer(35));
+		rootPane.add(flagConfigFrame, new Integer(40));
 		
 		
 		mainFrame.setVisible(true);
@@ -113,10 +119,13 @@ public class Shadow extends JFrame{
 		dropFrame.setVisible(false);
 		blurFrame.setVisible(false);
 		sshFrame.setVisible(false);
-		
+		flagConfigFrame.setVisible(false);
 		
 		// Register the menu with the main frame so that it will be visible 
 		mainFrame.setMenu(menuFrame);
+		
+		// Register the flag configuration frame so that it can be accessed from the footer bar
+		mainFrame.setFlagConfigFrame(flagConfigFrame);
 		
 		List<Image> icons;
 		try {
@@ -144,9 +153,11 @@ public class Shadow extends JFrame{
 				
 				sshFrame.setLocation(targetWidth/2 - sshFrame.getWidth()/2, targetHeight/2 - sshFrame.getHeight()/2);
 				
-				if(blurFrame.isVisible()){
-					blurFrame.setVisible(false);
-				}
+				flagConfigFrame.setLocation(Constants.FOOTER_COUNTER_WIDTH*2, targetHeight - Constants.FOOTER_SIZE - flagConfigFrame.getHeight());				
+				// TODO Should i enable this or just allow for the blur stretch effect?
+//				if(blurFrame.isVisible()){
+//					blurFrame.setVisible(false);
+//				}
 			}
 
 			@Override
@@ -187,6 +198,7 @@ public class Shadow extends JFrame{
 		} catch (TooManyListenersException e) {
 			e.printStackTrace();
 		}
+
 	}
 	
 	private Shadow getThis(){
@@ -259,7 +271,7 @@ public class Shadow extends JFrame{
 		return list;
 	}
 	
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		 try {
 			 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	    } 
@@ -279,7 +291,10 @@ public class Shadow extends JFrame{
 		
 		 java.awt.EventQueue.invokeLater(new Runnable() {
 	          public void run() {
-	               new Shadow();
+	               Shadow shadow = new Shadow();
+	               for(String path: args){
+	            	   shadow.openFile(new File(path));
+	               }
 	          }
 	    });
 	}

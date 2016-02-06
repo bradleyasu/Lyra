@@ -105,7 +105,7 @@ public class LocalLog implements Log{
 	 */
 	public String checkFlags(String line){
 		for(String flag : flags.keySet()) {
-			if(line.contains(flags.get(flag))){
+			if(line.matches(flags.get(flag))){
 				return flag;
 			}
 		}

@@ -28,7 +28,7 @@ public class Theme {
 	public static Color LINE_BOOKMARK_COLOR = new Color(0x8E44AD);
 	public static Color LINE_HOVER_COLOR = new Color(0xBDC3C7);
 	
-	public static Color LINE_FILTER_COLOR = new Color(0x9B59B6);
+	public static Color LINE_FILTER_COLOR = LINE_SELECT_COLOR.brighter();
 
 	
 	/* Footer colors */
