@@ -28,7 +28,15 @@ public interface Log {
 	/**
 	 * Closes and stops shadowing of the log
 	 */
-	public void close();
+	public void shutdown();
+	
+	/**
+	 * Stops shadow from tailing the log file but does not notify the
+	 * rest of the program that the log has stopped.  This is useful for 
+	 * restarting logging without the UI removing all references and then 
+	 * re-adding them
+	 */
+	public void stop();
 	
 	/**
 	 * Sets the log as "Activated" which means that it is the currently

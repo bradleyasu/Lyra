@@ -64,7 +64,7 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 			}
 
 			@Override
-			public void logClosed(String logId) {
+			public void logShutdown(String logId) {
 				remove();
 				refresh();
 			}
@@ -125,11 +125,9 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 	
 	private boolean isClosedIcon(int x, int y) {
 		boolean closeArea = false;
-		
 		if(x > Constants.SIDEBAR_WIDTH-25 && y < 20){
 			closeArea = true;
 		}
-		
 		return closeArea;
 	}
 
@@ -151,7 +149,7 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 			@Override
 			public void mousePressed(MouseEvent event) {
 				if(isClosedIcon(event.getX(), event.getY())){
-					log.close();
+					log.shutdown();
 				} else {
 					log.activate();
 				}

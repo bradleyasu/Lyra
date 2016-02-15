@@ -76,7 +76,7 @@ public class HttpLog implements Log{
 	@Override
 	public void startShadow() {
 		if(started){
-			close();
+			stop();
 		}
 		
 		started = true;
@@ -169,7 +169,14 @@ public class HttpLog implements Log{
 
 	
 	@Override
-	public void close() {
+	public void shutdown() {
+		stop();
+		for(LogListener listener : listeners){
+			listener.logShutdown(getLogId());
+		}
+	}
+	
+	public void stop() {
 	    // Close existing threads
 	    if(workerThread != null){
 	    	workerThread.interrupt();
@@ -180,11 +187,7 @@ public class HttpLog implements Log{
 	    	tailer = null;
 	    }
 		started = false;
-		for(LogListener listener : listeners){
-			listener.logClosed(getLogId());
-		}
 	}
-	
 	
 	@Override
 	public void addLogListener(LogListener listener) {

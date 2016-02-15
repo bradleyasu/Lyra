@@ -80,14 +80,18 @@ public class LocalLog implements Log{
 		}
 	}
 	
-	public void close() {
+	public void shutdown() {
+		stop();
+		for(LogListener listener : listeners){
+			listener.logShutdown(getLogId());
+		}
+	}
+	
+	public void stop() {
 		if(tailer != null) {
 			tailer.stop();
 		}
 		started = false;
-		for(LogListener listener : listeners){
-			listener.logClosed(getLogId());
-		}
 	}
 	
 	public void addFlag(String type, String query) {
@@ -153,7 +157,7 @@ public class LocalLog implements Log{
 			started = true;
 		} else {
 			// Reload file
-			close();
+			stop();
 			startShadow();
 		}
 	}

@@ -160,7 +160,7 @@ public class LogPanel extends JPanel{
 				}
 
 				@Override
-				public void logClosed(String logId) {
+				public void logShutdown(String logId) {
 					// TODO Auto-generated method stub
 					open = false;
 					reset();
@@ -256,7 +256,7 @@ public class LogPanel extends JPanel{
 				} else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_F){
 					notifyListeners(LogPanelEvent.HOTKEY_FIND, null);
 				} else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_W){
-					log.close();
+					log.shutdown();
 				} else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_S){
 					notifyListeners(LogPanelEvent.HOTKEY_SHADOW_MENU, null);
 				} 

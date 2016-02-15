@@ -67,7 +67,7 @@ public class SshLog implements Log {
 	public void startShadow() {
 		try {
 			if(started){
-				close();
+				stop();
 			}
 			if(!isSetup){
 				connectionSetup();
@@ -83,6 +83,7 @@ public class SshLog implements Log {
 			e.printStackTrace();
 		}
 	}
+	
 	
 	private void connectionSetup() throws JSchException, IOException{
 		jsch = new JSch();
@@ -129,7 +130,14 @@ public class SshLog implements Log {
 	}
 
 	@Override
-	public void close() {
+	public void shutdown() {
+		stop();
+		for(LogListener listener : listeners){
+			listener.logShutdown(getLogId());
+		}
+	}
+	
+	public void stop() {
 	    started = false;
 	    isSetup = false;
 	    
@@ -148,9 +156,6 @@ public class SshLog implements Log {
 	    }
 	
 		started = false;
-		for(LogListener listener : listeners){
-			listener.logClosed(getLogId());
-		}
 	}
 
 	@Override
@@ -227,7 +232,7 @@ public class SshLog implements Log {
 				}
 				
 				// Clean up any loose ends
-				close();
+				shutdown();
 			} catch (InterruptedException interupt){
 				// This is okay, the thread will be interrupted when closing
 			}
