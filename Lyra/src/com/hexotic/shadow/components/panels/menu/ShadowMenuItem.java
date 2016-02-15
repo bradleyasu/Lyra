@@ -9,6 +9,8 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -37,6 +39,8 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 	private Image icon;
 	private Image errorIcon;
 	private Image remoteIcon;
+	private Image closeIcon;
+	private List<MenuItemListener> listeners;
 	
 	public ShadowMenuItem(int id, Log l) {
 		itemId = id;
@@ -44,6 +48,8 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 		this.setMinimumSize(this.getPreferredSize());
 		this.setMaximumSize(this.getPreferredSize());
 		this.log = l;
+		
+		this.listeners = new ArrayList<MenuItemListener>();
 		
 		if(log.getFile().getName().endsWith(".sshadow")){
 			isRemote = true;
@@ -113,7 +119,18 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 			icon = Resources.getInstance().getImage("fileTypes/"+iconName);
 			errorIcon = Resources.getInstance().getImage("fileTypes/fileError.png");
 			remoteIcon = Resources.getInstance().getImage("flat_remote.png");
+			closeIcon = Resources.getInstance().getImage("flat_close.png");
 		} catch (ResourceException e) { }
+	}
+	
+	private boolean isClosedIcon(int x, int y) {
+		boolean closeArea = false;
+		
+		if(x > Constants.SIDEBAR_WIDTH-25 && y < 20){
+			closeArea = true;
+		}
+		
+		return closeArea;
 	}
 
 	private void bindMouseListener() {
@@ -132,8 +149,12 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 				refresh();
 			}
 			@Override
-			public void mousePressed(MouseEvent arg0) {
-				log.activate();
+			public void mousePressed(MouseEvent event) {
+				if(isClosedIcon(event.getX(), event.getY())){
+					log.close();
+				} else {
+					log.activate();
+				}
 			}
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
@@ -145,8 +166,18 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 		return itemId;
 	}
 	
+	public void addMenuItemListener(MenuItemListener listener) {
+		listeners.add(listener);
+	}
+	
 	public void remove() {
-		
+		for(MenuItemListener listener : listeners) {
+			listener.itemEventPerformed(new MenuItemEvent(getThis(), MenuItemEvent.CLOSE_EVENT));
+		}
+	}
+	
+	private ShadowMenuItem getThis() {
+		return this;
 	}
 	
 	public String getFileName() {
@@ -228,6 +259,8 @@ public class ShadowMenuItem extends JPanel implements Comparable<ShadowMenuItem>
 		g2d.setColor(Theme.FOOTER_BACKGROUND.brighter());
 		g2d.drawString(log.getLogId(), getWidth()-size.width, getHeight()-5);
 		
+		// Create Close Icon
+		g2d.drawImage(closeIcon, getWidth()-18, 2, null);
 	}
 
 	@Override

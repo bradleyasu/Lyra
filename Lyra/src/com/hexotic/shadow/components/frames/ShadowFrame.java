@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.io.File;
-import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JInternalFrame;
@@ -23,7 +22,6 @@ import com.hexotic.shadow.components.panels.footer.FooterBar;
 import com.hexotic.shadow.components.panels.footer.FooterCounter;
 import com.hexotic.shadow.components.panels.footer.FooterCounterListener;
 import com.hexotic.shadow.components.panels.footer.FooterMenuItemListener;
-import com.hexotic.shadow.configurations.FlagListener;
 import com.hexotic.shadow.configurations.Flags;
 import com.hexotic.shadow.constants.Constants;
 import com.hexotic.shadow.constants.Theme;
@@ -152,7 +150,7 @@ public class ShadowFrame extends JInternalFrame{
 				case LogPanelEvent.HOTKEY_FIND:
 					footer.getFilterBox().getField().requestFocus();
 					break;
-				case LogPanelEvent.HOTKEY_CLOSE:
+				case LogPanelEvent.LOG_CLOSED:
 					closeLog();
 					break;
 				case LogPanelEvent.HOTKEY_SHADOW_MENU:
@@ -174,7 +172,7 @@ public class ShadowFrame extends JInternalFrame{
 	public void closeLog()  {
 		footer.reset();
 		//logPanel.getLog().close();
-		logPanel.reset();
+		//logPanel.reset();
 		revalidate();
 		repaint();
 	}

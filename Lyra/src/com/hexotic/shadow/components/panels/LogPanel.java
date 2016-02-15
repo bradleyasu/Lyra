@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -66,6 +68,7 @@ public class LogPanel extends JPanel{
 	private boolean open = false;
 	private boolean failed = false;
 	
+	private ExecutorService executor = Executors.newFixedThreadPool(1);
 	
 	public LogPanel() {
 		panel = this;
@@ -86,16 +89,22 @@ public class LogPanel extends JPanel{
 		this.setFocusable(true);
 		obtainFocus();
 		
+		
 		Flags.getInstance().addFlagListner(new FlagListener(){
 			@Override
 			public void flagsUpdated(String logId) {
 				if(activeLogId.equals(logId)){
-					log.refreshFlags();
-					for(LogLine line : lines.values()){
-						line.setFlag(log.checkFlags(line.getText()));
-						line.refresh();
-						
-					}
+					Thread t = new Thread(new Runnable(){
+						public void run(){
+							log.refreshFlags();
+							for(LogLine line : lines.values()){
+								line.setFlag(log.checkFlags(line.getText()));
+								line.refresh();
+								
+							}
+						}
+					});
+					executor.execute(t);
 				}
 			}
 		});
@@ -154,7 +163,9 @@ public class LogPanel extends JPanel{
 				public void logClosed(String logId) {
 					// TODO Auto-generated method stub
 					open = false;
+					reset();
 					refresh();
+					notifyListeners(LogPanelEvent.LOG_CLOSED, logId);
 				}
 
 				@Override
@@ -245,7 +256,7 @@ public class LogPanel extends JPanel{
 				} else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_F){
 					notifyListeners(LogPanelEvent.HOTKEY_FIND, null);
 				} else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_W){
-					notifyListeners(LogPanelEvent.HOTKEY_CLOSE, null);
+					log.close();
 				} else if(key.isControlDown() && key.getKeyCode() == KeyEvent.VK_S){
 					notifyListeners(LogPanelEvent.HOTKEY_SHADOW_MENU, null);
 				} 
